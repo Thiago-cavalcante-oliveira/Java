@@ -44,22 +44,23 @@ public class Alunos {
     public void setMaterias(List<Materia> materias) {
         this.materias = materias;
     }
-/*private String calculaAprovacao(){
-            if(materias.nota < 50){
+
+private String calculaAprovacao(){
+            if(materias.getClass(i) < 50){
                 return "Reprovado";
             } else if (nota > 50 || nota < 70) {
                 return "Em recuperção";
             }else {
                 return "Aprovado";
             }
-    }*/
+    }
 
    /* public void imprimelistamaterias (){
         for (Materia valor: materias)
               {
             System.out.println(valor);
         }*/
-    }
+   // }
     public static void main(String[] args) {
 
         ArrayList<Materia> materias =  new ArrayList<Materia>();
@@ -69,17 +70,16 @@ public class Alunos {
         materias.add(new Materia("Artes",23));
 
         ArrayList<Alunos> alunos = new ArrayList<>();
-        alunos.add(new Alunos("João", 18, "A"));
-        alunos.add(new Alunos("Maria", 17, "B"));
-        alunos.add(new Alunos("Pedro", 16, "A"));
-       // alunos.add(new Alunos("Ana", 18, "B"));
- //       alunos.add(new Alunos("Mario", 14, "C"));
-     //   alunos.add(new Alunos("Joana", 23, "C"));
-        /*
 
+        alunos.add(new Alunos("João", 18, "A", materias));
 
+       alunos.add(new Alunos("Maria", 17, "B", materias));
+        alunos.add(new Alunos("Pedro", 16, "A", materias));
+        alunos.add(new Alunos("Ana", 18, "B", materias));
+        alunos.add(new Alunos("Mario", 14, "C", materias));
+        alunos.add(new Alunos("Joana", 23, "C", materias));
 
-
+/*
         alunos.add (new Alunos("Thiago", 37, "A", 93));
         alunos.add(new Alunos("Andre", 43, "B", 68));
         alunos.add(new Alunos("Ana", 22, "B", 43));
@@ -96,11 +96,26 @@ public class Alunos {
         alunos.add(new Alunos("Jairo", 32, "C", 87));*/
 
 
+       // Alunos alunos1= alunos.get(0).getMateria().get(0).getMateria();
+
         for (Alunos aluno : alunos) {
             for (Materia materia: materias){
 
             }
-            System.out.println(aluno.getNome()  + " - " + materias.getMateria);
+            for(int i=0;i< materias.size();i++) {
+
+                private String calculaAprovacao(){
+                    if(aluno.getMateria().get(i).getNota()< 50){
+                        return "Reprovado";
+                    } else if (aluno.getMateria().get(i).getNota() > 50 || aluno.getMateria().get(i).getNota() < 70) {
+                        return "Em recuperção";
+                    }else {
+                        return "Aprovado";
+                    }
+                }
+                System.out.println(aluno.getNome() + " - " + aluno.getMateria().get(i).getMateria() +
+                        "-" + aluno.getMateria().get(i).getNota());
+            }
         }
 
 
