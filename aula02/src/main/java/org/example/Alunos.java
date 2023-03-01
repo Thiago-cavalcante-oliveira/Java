@@ -9,7 +9,7 @@ public class Alunos {
     private String nome;
     private Integer idade;
     private String turma;
-    private String aprovacao;
+   // private String aprovacao;
     private List<Materia>  materias;
 
     public Alunos(String nome, Integer idade, String turma, List<Materia> materias){
@@ -17,12 +17,7 @@ public class Alunos {
         this.idade = idade;
         this.turma = turma;
         this.materias = materias;
-        //this.aprovacao = calculaAprovacao();
-       // for (Materia valor : materias) {
-       //     this.materias.add(valor);
-       // }
-
-    }
+           }
 
     public Integer getIdade() {
         return idade;
@@ -33,47 +28,37 @@ public class Alunos {
     public String getTurma(){
         return turma;
     }
-    public String getAprovacao(){
-        return aprovacao;
-    }
+    //public String getAprovacao(){
+     //   return aprovacao;
+   // }
 
     public List<Materia> getMateria() {
         return materias;
     }
+public String calculaAprovacao(int posicaoNota) {
+       if (materias.get(posicaoNota).getNota() < 50.0) {
+            return "Reprovado";
+       } else if (materias.get(posicaoNota).getNota() > 50.0 && materias.get(posicaoNota).getNota() < 70.0) {
+            return "Em recuperção";
+        } else {
+            return "Aprovado";
+           }
+}
 
-    public void setMaterias(List<Materia> materias) {
-        this.materias = materias;
-    }
+    public static void main (String[]args){
 
-private String calculaAprovacao(){
-            if(materias.getClass(i) < 50){
-                return "Reprovado";
-            } else if (nota > 50 || nota < 70) {
-                return "Em recuperção";
-            }else {
-                return "Aprovado";
-            }
-    }
-
-   /* public void imprimelistamaterias (){
-        for (Materia valor: materias)
-              {
-            System.out.println(valor);
-        }*/
-   // }
-    public static void main(String[] args) {
-
-        ArrayList<Materia> materias =  new ArrayList<Materia>();
+        ArrayList<Materia> materias = new ArrayList<Materia>();
         materias.add(new Materia("Ciências", 75));
-        materias.add( new Materia("Matemática", 80));
+        materias.add(new Materia("Matemática", 80));
         materias.add(new Materia("História", 49));
-        materias.add(new Materia("Artes",23));
+        materias.add(new Materia("Artes", 23));
+
 
         ArrayList<Alunos> alunos = new ArrayList<>();
 
         alunos.add(new Alunos("João", 18, "A", materias));
 
-       alunos.add(new Alunos("Maria", 17, "B", materias));
+        alunos.add(new Alunos("Maria", 17, "B", materias));
         alunos.add(new Alunos("Pedro", 16, "A", materias));
         alunos.add(new Alunos("Ana", 18, "B", materias));
         alunos.add(new Alunos("Mario", 14, "C", materias));
@@ -96,28 +81,18 @@ private String calculaAprovacao(){
         alunos.add(new Alunos("Jairo", 32, "C", 87));*/
 
 
-       // Alunos alunos1= alunos.get(0).getMateria().get(0).getMateria();
+        // Alunos alunos1= alunos.get(0).getMateria().get(0).getMateria();
 
         for (Alunos aluno : alunos) {
-            for (Materia materia: materias){
-
+            for (Materia materia : materias) {
             }
-            for(int i=0;i< materias.size();i++) {
-
-                private String calculaAprovacao(){
-                    if(aluno.getMateria().get(i).getNota()< 50){
-                        return "Reprovado";
-                    } else if (aluno.getMateria().get(i).getNota() > 50 || aluno.getMateria().get(i).getNota() < 70) {
-                        return "Em recuperção";
-                    }else {
-                        return "Aprovado";
-                    }
-                }
+            for (int i = 0; i < materias.size(); i++) {
                 System.out.println(aluno.getNome() + " - " + aluno.getMateria().get(i).getMateria() +
-                        "-" + aluno.getMateria().get(i).getNota());
+                        "-" + aluno.getMateria().get(i).getNota() + "-" + aluno.calculaAprovacao(i) + "\n");
             }
         }
 
 
+    }
 }
-}
+

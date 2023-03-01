@@ -7,10 +7,12 @@ public class Materia {
     private double nota;
 
 
+
     public Materia(String materia, double nota) {
 
         this.materia = materia;
         this.nota = nota;
+
     }
 
     public String getMateria() {
