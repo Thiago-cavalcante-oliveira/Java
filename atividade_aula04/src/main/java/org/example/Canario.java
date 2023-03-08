@@ -1,11 +1,15 @@
 package org.example;
+import java.text.*;
+import java.util.Locale;
 
 public class Canario implements Animal{
     @Override
     public String comer(String periodo) {
-        if (periodo == "manha"){
+        Collator collator = Collator.getInstance(new Locale("pt", "BR"));
+        collator.setStrength(Collator.PRIMARY);
+        if (collator.compare(periodo, "MANHÃ")==0){
             return "semente";
-        } else if (periodo == "tarde") {
+        } else if ((collator.compare(periodo, "TARDE")==0)) {
             return "insetos";
         }else return "frutas";
     }

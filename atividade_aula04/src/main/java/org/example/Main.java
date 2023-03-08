@@ -24,7 +24,7 @@ public class Main {
     System.out.println(cavalo.especie());
     System.out.println("\n");
 
-    System.out.println(canario.comer("manha"));
+    System.out.println(canario.comer("TÃrdé"));
     System.out.println(canario.som());
     System.out.println(canario.especie());
     System.out.println("\n");

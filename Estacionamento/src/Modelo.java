@@ -2,8 +2,9 @@ public class Modelo extends Marca{
     private String nome;
     private Marca marca;
 
-    public Modelo (String nome, Marca marca){
-        this.nome = nome;
+    public Modelo(String nome, String nome1, Marca marca) {
+        super(nome);
+        this.nome = nome1;
         this.marca = marca;
     }
 

@@ -2,11 +2,11 @@ import java.time.LocalDateTime;
 
 public abstract class Entitty {
     protected Long id;
-    public LocalDateTime cadastro;
-    public LocalDateTime edicao;
-    public boolean ativo;
+    private LocalDateTime cadastro;
+    private LocalDateTime edicao;
+    private boolean ativo;
 
-    public Entitty(){
+    public Entitty(Long id, LocalDateTime cadastro, LocalDateTime edicao, boolean ativo){
         this.id = id;
         this.cadastro = cadastro;
         this.edicao = edicao;
