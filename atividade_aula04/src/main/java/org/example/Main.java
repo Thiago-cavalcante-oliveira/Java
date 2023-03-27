@@ -3,7 +3,7 @@ package org.example;
 public class Main {
     public static void main(String[] args) {
 
-    Cachorro cachorro = new Cachorro();
+    /*Cachorro cachorro = new Cachorro();
     Gato gato = new Gato();
     Cavalo cavalo = new Cavalo();
     Canario canario = new Canario();
@@ -24,7 +24,7 @@ public class Main {
     System.out.println(cavalo.especie());
     System.out.println("\n");
 
-    System.out.println(canario.comer("manha"));
+    System.out.println(canario.comer("TÃrdé"));
     System.out.println(canario.som());
     System.out.println(canario.especie());
     System.out.println("\n");
@@ -32,7 +32,11 @@ public class Main {
     System.out.println(galo.comer("manha"));
     System.out.println(galo.som());
     System.out.println(galo.especie());
-    System.out.println("\n");
+    System.out.println("\n");*/
+        nome samir = new nome();
+        nome thiago = new nome();
 
+        System.out.println(nome.id);
+        System.out.println(nome.id);
     }
 }

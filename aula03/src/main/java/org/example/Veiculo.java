@@ -30,7 +30,7 @@ public abstract class Veiculo {
     }
 
     public String velocidade(){
-        return "Veloidade do Veículo é:" + 125 "km/h";
+        return "Veloidade do Veículo é:" + 125 + "km/h";
     }
     public String buzina(){
         return "Bip Bip veículo";
