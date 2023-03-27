@@ -15,11 +15,31 @@ public class Professor {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "co-professor", nullable = false, unique = true)
     private Long id;
-    @Getter @Setter
+    @Getter
+    @Setter
     @Column(name = "nm-professor", nullable = false, unique = true, length = 100)
     private String nome;
+
+
+
+
     @Getter @Setter
-    @JoinColumn(name = "co-aluno")
-    @OneToMany
-    private List<Aluno> aluno;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "professor-aluno",
+            uniqueConstraints = @UniqueConstraint(
+                    columnNames = {
+                            "co-professor",
+                            "co-aluno"
+                    }
+            ),
+            joinColumns = @JoinColumn(
+                    name = "co-professor"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "co-aluno"
+            )
+    )
+    private List<Aluno> alunos;
+
+
 }

@@ -20,6 +20,6 @@ public class Aluno {
     private Integer cpf;
     @Getter @Setter
     @JoinColumn(name = "ds-endereco",nullable = false)
-    @ManyToOne
+    @OneToOne
     private Endereco endereco;
 }
