@@ -70,16 +70,15 @@ public class MovimentacaoController {
         return ResponseEntity.ok("Carro estacionado");
     }
 
-    @PutMapping
-    public ResponseEntity<?> atualizaMovimentacao(@RequestParam("id") final Long id,
-                                           @RequestBody final Movimentacao movimentacao) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizaMovimentacao(@PathVariable("id") final Long id, @RequestBody final Movimentacao movimentacao) {
         try {
             final Movimentacao movimentacaoBanco = this.movimentacaoRepositorio.findById(id).orElse(null);
             if (movimentacaoBanco == null || !movimentacaoBanco.getId().equals(movimentacao.getId())) {
                 throw new RuntimeException("Não foi possível localizar");
             }
             this.movimentacaoRepositorio.save(movimentacao);
-            return ResponseEntity.ok("Marca atualizada!");
+            return ResponseEntity.ok("Movimentacao atualizada!");
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
         } catch (RuntimeException e) {
@@ -87,30 +86,30 @@ public class MovimentacaoController {
         }
     }
 
-
-        @DeleteMapping ("/{id}")
-
-        public ResponseEntity <?> inativar(
-            @PathVariable("id") Long id
-
-    ){
+    @DeleteMapping ("/{id}")
+    public ResponseEntity <?> inativar(@PathVariable("id") Long id){
         try {
-
-            final Movimentacao movimentacaoBanco = this.movimentacaoRepositorio.findById(id).orElse(null);
-
-            if (movimentacaoBanco == null ){
+            final Movimentacao valorBanco = this.movimentacaoRepositorio.findById(id).orElse(null);
+            if (valorBanco == null ){
                 throw new RuntimeException("Não foi possível identificar o registro");
             }
-            movimentacaoBanco.setAtivo(false);
-            this.movimentacaoRepositorio.save(movimentacaoBanco);
-            return ResponseEntity.ok("Registro deletado");
+            valorBanco.setAtivo(false);
+            this.movimentacaoRepositorio.delete(valorBanco);
+            return ResponseEntity.ok("Registro Deletado");
         }
         catch (DataIntegrityViolationException e){
-            return  ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
+            return  ResponseEntity.internalServerError().body("Error"+e + e.getCause().getCause().getMessage());
         }
-        catch (RuntimeException e){
-            return ResponseEntity.internalServerError().body("Error");
+        catch (Exception e){
+            final Movimentacao valorBanco = this.movimentacaoRepositorio.findById(id).orElse(null);
+            if (valorBanco == null ){
+                throw new RuntimeException("Não foi possível identificar o registro");
+            }
+            valorBanco.setAtivo(false);
+            this.movimentacaoRepositorio.save(valorBanco);
+            return ResponseEntity.ok("Registro Inativado");
         }
+
 
     }
 

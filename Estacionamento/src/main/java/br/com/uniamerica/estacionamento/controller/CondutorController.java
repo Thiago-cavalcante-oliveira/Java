@@ -44,18 +44,14 @@ public class CondutorController {
     @GetMapping //outra forma de buscar po id
     public ResponseEntity <?> findByIdRequest(@RequestParam("id")final Long id ){
         final Condutor condutor = this.condutorRepositorio.findById(id).orElse(null);
-        return condutor == null
-                ? ResponseEntity.badRequest().body("nenhum valor encontrado") :
+        return condutor == null ? ResponseEntity.badRequest().body("nenhum valor encontrado") :
                  ResponseEntity.ok(condutor);
     }
-       // return ResponseEntity.ok(new Condutor());
-       @GetMapping("/listaativo")
-       public ResponseEntity <?> listaAtivo (){
 
+   @GetMapping("/listaativo")
+   public ResponseEntity <?> listaCondutorAtivo (){
            List<Condutor> condutor = this.condutorRepositorio.findAll();
-
            List <Condutor> condutorAtivo= new ArrayList();
-
            for (Condutor valor: condutor
            ) {
                if (valor.isAtivo())
@@ -64,12 +60,11 @@ public class CondutorController {
                }
            }
            return ResponseEntity.ok(condutorAtivo) ;
-
        }
 
 
     @GetMapping("/lista")
-    public ResponseEntity <?> listaCompleta (){
+    public ResponseEntity <?> listaCompletaCondutor (){
         return ResponseEntity.ok(this.condutorRepositorio.findAll());
     }
 
@@ -78,20 +73,19 @@ public class CondutorController {
         this.condutorRepositorio.save(condutor);
         return ResponseEntity.ok("Registro cadastrado com sucesso");
     }
-   @PutMapping("id")
+
+   @PutMapping("/{id}")
     public ResponseEntity <?> editar(
-            @RequestParam("id") Long id,
+            @PathVariable("id") Long id,
             @RequestBody final Condutor condutor
    ){
         try {
-
             final Condutor condutorBanco = this.condutorRepositorio.findById(id).orElse(null);
-
             if (condutorBanco == null || !condutorBanco.getId().equals(condutor.getId())){
             throw new RuntimeException("Não foi possível identificar o registro");
         }
         this.condutorRepositorio.save(condutor);
-        return ResponseEntity.ok("Registro cadastrado");
+        return ResponseEntity.ok("Registro Atualizado");
         }
         catch (DataIntegrityViolationException e){
             return  ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
@@ -99,35 +93,31 @@ public class CondutorController {
        catch (RuntimeException e){
             return ResponseEntity.internalServerError().body("Error");
        }
-
    }
 
 
 
     @DeleteMapping ("/{id}")
-
-    public ResponseEntity <?> inativar(
-            @PathVariable("id") Long id
-    ){
+    public ResponseEntity <?> inativar(@PathVariable("id") Long id){
        try {
-
             final Condutor condutorBanco = this.condutorRepositorio.findById(id).orElse(null);
-
-           // if (condutorBanco == null ){
-               // throw new RuntimeException("Não foi possível identificar o registro");
-            //}
+            if (condutorBanco == null ){
+                throw new RuntimeException("Não foi possível identificar o registro");
+           }
             this.condutorRepositorio.delete(condutorBanco);
-            return ResponseEntity.ok("Registro cadastrado");
+            return ResponseEntity.ok("Registro Deletado");
         }
         catch (DataIntegrityViolationException e){
             return  ResponseEntity.internalServerError().body("Error"+e + e.getCause().getCause().getMessage());
         }
-       // try{
-       //     final Condutor condutor = this.condutorRepositorio.findById(id).orElse(null);
-        //    Responsedelete(condutor)
-      // }
         catch (Exception e){
-            return ResponseEntity.internalServerError().body("Error");
+            final Condutor condutorBanco = this.condutorRepositorio.findById(id).orElse(null);
+            if (condutorBanco == null ){
+                throw new RuntimeException("Não foi possível identificar o registro");
+            }
+            condutorBanco.setAtivo(false);
+            this.condutorRepositorio.save(condutorBanco);
+            return ResponseEntity.ok("Registro Inativado");
         }
 
     }

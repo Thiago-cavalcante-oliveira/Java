@@ -1,5 +1,6 @@
 package br.com.uniamerica.estacionamento.controller;
 
+import br.com.uniamerica.estacionamento.entity.Condutor;
 import br.com.uniamerica.estacionamento.entity.Marca;
 import br.com.uniamerica.estacionamento.repository.MarcaRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,8 @@ public class MarcaController {
         this.marcaRepositorio.save(marca);
         return ResponseEntity.ok("MArca cadstrada com sucesso");
     }
-    @PutMapping
-        public ResponseEntity<?> atualizaMarca(@RequestParam("id") final Long id,
+    @PutMapping("/{id}")
+        public ResponseEntity<?> atualizaMarca(@PathVariable("id") final Long id,
                                                @RequestBody final Marca marca)
     {
         try {
@@ -65,11 +66,35 @@ public class MarcaController {
             return  ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
         }
         catch (RuntimeException e){
-            return ResponseEntity.internalServerError().body("Error");
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
 
     }
 
+    @DeleteMapping ("/{id}")
+    public ResponseEntity <?> inativar(@PathVariable("id") Long id){
+        try {
+            final Marca marcaBanco = this.marcaRepositorio.findById(id).orElse(null);
+            if (marcaBanco == null ){
+                throw new RuntimeException("Não foi possível identificar o registro");
+            }
+            this.marcaRepositorio.delete(marcaBanco);
+            return ResponseEntity.ok("Registro Deletado");
+        }
+        catch (DataIntegrityViolationException e){
+            return  ResponseEntity.internalServerError().body("Error"+e + e.getCause().getCause().getMessage());
+        }
+        catch (Exception e){
+            final Marca marcaBanco = this.marcaRepositorio.findById(id).orElse(null);
+            if (marcaBanco == null ){
+                throw new RuntimeException("Não foi possível identificar o registro");
+            }
+            marcaBanco.setAtivo(false);
+            this.marcaRepositorio.save(marcaBanco);
+            return ResponseEntity.ok("Registro Inativado");
+        }
+
+    }
 
 
 
