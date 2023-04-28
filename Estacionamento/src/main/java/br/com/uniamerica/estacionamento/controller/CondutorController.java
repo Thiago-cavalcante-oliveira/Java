@@ -10,6 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequestMapping(value = "/api/condutor")
 public class CondutorController {
@@ -46,6 +49,23 @@ public class CondutorController {
                  ResponseEntity.ok(condutor);
     }
        // return ResponseEntity.ok(new Condutor());
+       @GetMapping("/listaativo")
+       public ResponseEntity <?> listaAtivo (){
+
+           List<Condutor> condutor = this.condutorRepositorio.findAll();
+
+           List <Condutor> condutorAtivo= new ArrayList();
+
+           for (Condutor valor: condutor
+           ) {
+               if (valor.isAtivo())
+               {
+                   condutorAtivo.add(valor);
+               }
+           }
+           return ResponseEntity.ok(condutorAtivo) ;
+
+       }
 
 
     @GetMapping("/lista")
@@ -84,21 +104,50 @@ public class CondutorController {
 
 
 
-    @DeleteMapping ("id")
+    @DeleteMapping ("/{id}")
 
-    public ResponseEntity <?> deletar(
-            @RequestParam("id") Long id,
-            @RequestBody final Condutor condutor
+    public ResponseEntity <?> inativar(
+            @PathVariable("id") Long id
+    ){
+       try {
+
+            final Condutor condutorBanco = this.condutorRepositorio.findById(id).orElse(null);
+
+           // if (condutorBanco == null ){
+               // throw new RuntimeException("Não foi possível identificar o registro");
+            //}
+            this.condutorRepositorio.delete(condutorBanco);
+            return ResponseEntity.ok("Registro cadastrado");
+        }
+        catch (DataIntegrityViolationException e){
+            return  ResponseEntity.internalServerError().body("Error"+e + e.getCause().getCause().getMessage());
+        }
+       // try{
+       //     final Condutor condutor = this.condutorRepositorio.findById(id).orElse(null);
+        //    Responsedelete(condutor)
+      // }
+        catch (Exception e){
+            return ResponseEntity.internalServerError().body("Error");
+        }
+
+    }
+
+   /* @DeleteMapping ("/{id}")
+
+    public ResponseEntity <?> inativar(
+            @PathVariable("id") Long id
+
     ){
         try {
 
             final Condutor condutorBanco = this.condutorRepositorio.findById(id).orElse(null);
 
-            if (condutorBanco == null || !condutorBanco.getId().equals(condutor.getId())){
+            if (condutorBanco == null ){
                 throw new RuntimeException("Não foi possível identificar o registro");
             }
-            this.condutorRepositorio.save(condutor);
-            return ResponseEntity.ok("Registro cadastrado");
+            condutorBanco.setAtivo(false);
+            this.condutorRepositorio.save(condutorBanco);
+            return ResponseEntity.ok("Registro deletado");
         }
         catch (DataIntegrityViolationException e){
             return  ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
@@ -108,8 +157,7 @@ public class CondutorController {
         }
 
     }
-
-
+*/
 
 
 }
