@@ -20,9 +20,9 @@ import java.util.List;
 public class MovimentacaoController {
 
     private MovimentacaoRepositorio movimentacaoRepositorio;
-    public MovimentacaoController (MovimentacaoRepositorio movimentacaoRepositorio){
-        this.movimentacaoRepositorio = movimentacaoRepositorio;
-    }
+    //public MovimentacaoController (MovimentacaoRepositorio movimentacaoRepositorio){
+    //    this.movimentacaoRepositorio = movimentacaoRepositorio;
+    //}
 
     @GetMapping("/{id}")
     public ResponseEntity<?> buscaMovimentacao(@RequestParam("id") final Long id){

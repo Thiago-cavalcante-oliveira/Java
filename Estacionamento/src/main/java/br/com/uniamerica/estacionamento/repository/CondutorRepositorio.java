@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CondutorRepositorio extends JpaRepository <Condutor, Long> {
+    @Override
+    <S extends Condutor> S saveAndFlush(S entity);
 }

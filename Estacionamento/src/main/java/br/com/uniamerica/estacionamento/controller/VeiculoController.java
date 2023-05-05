@@ -27,7 +27,7 @@ public class VeiculoController {
         return ResponseEntity.ok(veiculo);
     }
 
-    @GetMapping
+    @GetMapping("/lista")
     public ResponseEntity<?> buscaLista() {
         return ResponseEntity.ok(this.veiculoRepositorio.findAll());
     }

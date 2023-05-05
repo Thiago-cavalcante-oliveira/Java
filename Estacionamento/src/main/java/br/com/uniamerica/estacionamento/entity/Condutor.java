@@ -11,30 +11,30 @@ import org.springframework.context.annotation.EnableMBeanExport;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 @Entity
-@Table(name = "Condutores", schema = "public")
+@Table(name = "tb_condutores", schema = "public")
 @Audited
 @AuditTable(value = "condutores_audit", schema = "audit")
 public class Condutor extends Entitty {
     @Getter
     @Setter
-    @Column(name = "nm-condutor", nullable = false, length = 100)
+    @Column(name = "nm_condutor", nullable = false, length = 100)
     private String nome;
     @Getter
     @Setter
-    @Column(name = "num-cpf-condutor", nullable = false, unique = true, length = 12)
+    @Column(name = "num_cpf_condutor", nullable = false, unique = true, length = 12)
     private String cpf;
     @Getter
     @Setter
-    @Column(name = "num-tel-condutor", nullable = false, length = 17)
+    @Column(name = "num_tel_condutor", nullable = false, length = 17)
     private String telefone;
     @Getter
     @Setter
-    @Column(name = "ds-tempo-pago", nullable = false)
+    @Column(name = "tempo_pago", nullable = false)
 
     private LocalTime tempoPago;
     @Getter
     @Setter
-    @Column(name = "ds-tempo-desconto", nullable = false)
+    @Column(name = "tempo_desconto", nullable = false)
     private LocalTime tempoDesconto;
 }
 

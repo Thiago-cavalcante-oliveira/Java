@@ -2,6 +2,7 @@ package br.com.uniamerica.estacionamento.controller;
 
 import br.com.uniamerica.estacionamento.entity.Configuracao;
 import br.com.uniamerica.estacionamento.repository.ConfiguracaoRepositorio;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -10,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping(value = "/api/configuracao")
 public class ConfiguracaoController {
-
+@Autowired
     private ConfiguracaoRepositorio configuracaoRepositorio;
-    public ConfiguracaoController(ConfiguracaoController configuracaoController){
-        this.configuracaoRepositorio = configuracaoRepositorio;
-    }
+    //public ConfiguracaoController(ConfiguracaoController configuracaoController){
+      //  this.configuracaoRepositorio = configuracaoRepositorio;
+    //}
 
     @GetMapping
     public ResponseEntity <?> buscaid(@RequestParam("id") final Long id){

@@ -1,8 +1,11 @@
 package br.com.uniamerica.estacionamento.controller;
 
+import br.com.uniamerica.estacionamento.entity.Marca;
 import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.entity.Movimentacao;
 import br.com.uniamerica.estacionamento.repository.ModeloRepositorio;
+import br.com.uniamerica.estacionamento.service.ModeloService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,46 +19,50 @@ import java.util.List;
 @RequestMapping(value = "/api/modelo")
 
 public class ModeloController {
-    private ModeloRepositorio modeloRepositorio;
-    public ModeloController(ModeloController modeloController ){
-        this.modeloRepositorio = modeloRepositorio;
-    }
+    @Autowired
+    private ModeloService service;
+    @Autowired
+    private ModeloRepositorio repository;
+
 
     @GetMapping
-    public ResponseEntity<?> buscaModelo(@RequestParam("id") final Long id){
-        final Modelo modelo = this.modeloRepositorio.findById(id).orElse(null);
-        return modelo == null ? ResponseEntity.badRequest().body("Não localizado") :
-        ResponseEntity.ok(modelo);
+    public ResponseEntity<?> buscarModelo(@RequestParam("id") final Long id){
+        try{
+        return ResponseEntity.ok(service.BuscarPorID(id));
             }
+        catch (RuntimeException e){
+          return  ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/lista")
     public ResponseEntity<?> buscaListaModelo(){
-        return ResponseEntity.ok(this.modeloRepositorio.findAll());
+                return ResponseEntity.ok(repository.findAll());
             }
 
     @GetMapping("/listaativo")
     public ResponseEntity<?> buscaListaAtivo(){
-        List <Modelo> modeloLista = this.modeloRepositorio.findAll();
-        List <Modelo> checaLista    = new ArrayList<>();
-        for (Modelo valor:modeloLista
-             ) {
-            if ( valor.isAtivo()){
-                checaLista.add(valor);
-            }
+        return ResponseEntity.ok(repository.modeloAtivo());
+         }
+
+    @PostMapping
+    public ResponseEntity<?> cadastrarModelo(@PathVariable Modelo modelo){
+        try{
+            this.service.cadastrarModelo(modelo);
+           return ResponseEntity.ok("Modelo cadastrado com sucesso");
         }
-        return ResponseEntity.ok(checaLista);
+        catch (RuntimeException e){
+           return ResponseEntity.badRequest().body("Erro: "+ e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizaModelo(@PathVariable final Long id, @RequestBody Modelo modelo) {
         try {
-            Modelo valorBanco = this.modeloRepositorio.findById(id).orElse(null);
-            if (valorBanco == null || !valorBanco.getId().equals(modelo.getId())) {
-                throw new RuntimeException("Não foi possível localizar");
-            }
-            this.modeloRepositorio.save(modelo);
-            return ResponseEntity.ok("Modelo Atualizado com sucesso.");
+            this.service.AtualizarModelo(modelo,id);
+            return ResponseEntity.ok("Modelo Atualizado com sucesso.") ;
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
+            return ResponseEntity.badRequest().body("Error" + e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError().body("Error");
         }
@@ -63,23 +70,13 @@ public class ModeloController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluiModelo(@PathVariable final Long id) {
+
         try {
-            Modelo valorBanco = this.modeloRepositorio.findById(id).orElse(null);
-            if (valorBanco == null ) {
-                throw new RuntimeException("Não foi possível localizar");
-            }
-            this.modeloRepositorio.delete(valorBanco);
+
+            this.service.deletar(id);
             return ResponseEntity.ok("Modelo deletado com sucesso.");
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
-        } catch (Exception e){
-            final Modelo valorBanco = this.modeloRepositorio.findById(id).orElse(null);
-            if (valorBanco == null ){
-                throw new RuntimeException("Não foi possível identificar o registro");
-            }
-            valorBanco.setAtivo(false);
-            this.modeloRepositorio.save(valorBanco);
-            return ResponseEntity.ok("Registro Inativado");
+        } catch (RuntimeException e){
+            return  ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
 
