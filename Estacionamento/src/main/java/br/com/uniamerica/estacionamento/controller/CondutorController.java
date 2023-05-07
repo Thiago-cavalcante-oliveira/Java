@@ -3,6 +3,7 @@ package br.com.uniamerica.estacionamento.controller;
 import br.com.uniamerica.estacionamento.entity.Condutor;
 import br.com.uniamerica.estacionamento.repository.CondutorRepositorio;
 import br.com.uniamerica.estacionamento.repository.ModeloRepositorio;
+import br.com.uniamerica.estacionamento.service.CondutorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -21,45 +22,24 @@ public class CondutorController {
     //private CondutorRepositorio condutorRepositorio;
     @Autowired
     private CondutorRepositorio condutorRepositorio;
-    public CondutorController (CondutorRepositorio condutorRepositorio){
-        this.condutorRepositorio = condutorRepositorio;
-    }
+   @Autowired
+   private CondutorService service;
 
-    /*
-    http://localhost:8080/api/condutor/1
-
-     */
-/*
-    @GetMapping("/{id}") //
-    public ResponseEntity <?> findByIdRequest(@PathVariable("id")final long id ){
-        //return ResponseEntity.ok(new Condutor());
-
-        return ResponseEntity.ok(this.condutorRepositorio.findById(id).orElse(null));
-    }*/
-/*
-    http://localhost:8080/api/condutor?id=1
-
-     */
-
-    @GetMapping //outra forma de buscar po id
+      @GetMapping //outra forma de buscar po id
     public ResponseEntity <?> findByIdRequest(@RequestParam("id")final Long id ){
-        final Condutor condutor = this.condutorRepositorio.findById(id).orElse(null);
-        return condutor == null ? ResponseEntity.badRequest().body("nenhum valor encontrado") :
-                 ResponseEntity.ok(condutor);
+        try{
+         return ResponseEntity.ok( this.service.BuscarPorID(id));
+        }
+        catch (RuntimeException e){
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
     }
+
 
    @GetMapping("/listaativo")
    public ResponseEntity <?> listaCondutorAtivo (){
-           List<Condutor> condutor = this.condutorRepositorio.findAll();
-           List <Condutor> condutorAtivo= new ArrayList();
-           for (Condutor valor: condutor
-           ) {
-               if (valor.isAtivo())
-               {
-                   condutorAtivo.add(valor);
-               }
-           }
-           return ResponseEntity.ok(condutorAtivo) ;
+
+           return ResponseEntity.ok(condutorRepositorio.listarAtivos()) ;
        }
 
 
@@ -69,11 +49,14 @@ public class CondutorController {
     }
 
     @PostMapping
-    public ResponseEntity <?> cadastrar (@RequestBody final Condutor condutor){
-        this.condutorRepositorio.save(condutor);
-        return ResponseEntity.ok("Registro cadastrado com sucesso");
+    public ResponseEntity <?> cadastrar (@RequestBody final Condutor condutor) {
+        try {
+            this.service.cadastrar(condutor);
+            return ResponseEntity.ok("Registro cadastrado com sucesso");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
     }
-
    @PutMapping("/{id}")
     public ResponseEntity <?> editar(
             @PathVariable("id") Long id,
@@ -122,32 +105,7 @@ public class CondutorController {
 
     }
 
-   /* @DeleteMapping ("/{id}")
 
-    public ResponseEntity <?> inativar(
-            @PathVariable("id") Long id
-
-    ){
-        try {
-
-            final Condutor condutorBanco = this.condutorRepositorio.findById(id).orElse(null);
-
-            if (condutorBanco == null ){
-                throw new RuntimeException("Não foi possível identificar o registro");
-            }
-            condutorBanco.setAtivo(false);
-            this.condutorRepositorio.save(condutorBanco);
-            return ResponseEntity.ok("Registro deletado");
-        }
-        catch (DataIntegrityViolationException e){
-            return  ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
-        }
-        catch (RuntimeException e){
-            return ResponseEntity.internalServerError().body("Error");
-        }
-
-    }
-*/
 
 
 }

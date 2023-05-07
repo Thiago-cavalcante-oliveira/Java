@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -20,13 +22,13 @@ public interface ModeloRepositorio extends JpaRepository <Modelo, Long> {
     @Query("SELECT modelo from Modelo modelo")//traz a lista completa
     List<Modelo> listaModelos();
     @Query("SELECT veiculo FROM   Veiculo veiculo where  veiculo.modelo = :id")
-    public boolean checaUso(@Param("id")Long id);
+    public boolean checaUso(@RequestParam("id")Long id);
 
     @Query("SELECT modelo FROM Modelo modelo WHERE modelo.nome = :nome")//checa se o nome a ser cadastrado já existe no banco
-    public boolean checaNomeModelo(@Param("nome") String nome);
+    public boolean checaNomeModelo(@PathVariable("nome") String nome);
 
     @Query("SELECT modelo FROM Modelo modelo where modelo.id != :id")//checa se o ID existe no banco
-    public boolean ChecaId(@Param("id")Long id);
+    public boolean ChecaId(@RequestParam("id")Long id);
 
 
     @Modifying

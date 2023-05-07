@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-
 public class ModeloService  {
     @Autowired
     private ModeloRepositorio repository;

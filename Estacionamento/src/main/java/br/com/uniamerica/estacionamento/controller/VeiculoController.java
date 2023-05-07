@@ -1,8 +1,11 @@
 package br.com.uniamerica.estacionamento.controller;
 
-import br.com.uniamerica.estacionamento.entity.Modelo;
+import br.com.uniamerica.estacionamento.entity.Marca;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
 import br.com.uniamerica.estacionamento.repository.VeiculoRepositorio;
+import br.com.uniamerica.estacionamento.service.MarcaService;
+import br.com.uniamerica.estacionamento.service.VeiculoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +18,9 @@ import java.util.List;
 @RequestMapping(value = "/api/veiculo")
 
 public class VeiculoController {
+    @Autowired
+    private VeiculoService service;
+    @Autowired
     private VeiculoRepositorio veiculoRepositorio;
 
     public VeiculoController(VeiculoRepositorio veiculoRepositorio) {
@@ -23,8 +29,11 @@ public class VeiculoController {
 
     @GetMapping
     public ResponseEntity<?> buscaVeiculoPorId(@RequestParam("id") final Long id) {
-        final Veiculo veiculo = this.veiculoRepositorio.findById(id).orElse(null);
-        return ResponseEntity.ok(veiculo);
+        try {
+            return ResponseEntity.ok(veiculoRepositorio.checaId(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro:" + e.getMessage());
+        }
     }
 
     @GetMapping("/lista")
@@ -34,58 +43,39 @@ public class VeiculoController {
 
     @GetMapping("/listaativo")
     public ResponseEntity<?> buscaListaAtivo() {
-        List<Veiculo> listaVeiuclo = this.veiculoRepositorio.findAll();
-        List<Veiculo> checaLista = new ArrayList();
-        for (Veiculo valor : checaLista
-        ) {
-            if (valor.isAtivo()) {
-                checaLista.add(valor);
-            }
-        }
-        return ResponseEntity.ok(checaLista);
+        return ResponseEntity.ok(veiculoRepositorio.listarAtivos());
     }
 
     @PostMapping
     public ResponseEntity<?> cadastraVeiculo(@RequestBody final Veiculo veiculo) {
-        this.veiculoRepositorio.save(veiculo);
-        return ResponseEntity.ok("Cadastrado com sucesso.");
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> atualizaVeiculo(@PathVariable final Long id, @RequestBody Veiculo veiculo) {
         try {
-            Veiculo valorBanco = this.veiculoRepositorio.findById(id).orElse(null);
-            if (valorBanco == null || !valorBanco.getId().equals(veiculo.getId())) {
-                throw new RuntimeException("Não localizado");
-            }
-            this.veiculoRepositorio.save(veiculo);
-            return ResponseEntity.ok("Veiculo atualizado.");
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
+            service.cadastrar(veiculo);
+
+            return ResponseEntity.ok("Cadastrado com sucesso.");
         } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().body("Error");
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
+    }
+    @PutMapping("/{id}")
+        public ResponseEntity<?> atualizar(@PathVariable("id") final Long id,
+        @RequestBody final Veiculo veiculo){
+        try {
+            this.service.Atualizar(id, veiculo);
+            return ResponseEntity.ok("Veiculo atualizado.");
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> atualizaVeiculo(@PathVariable final Long id) {
         try {
-            Veiculo valorBanco = this.veiculoRepositorio.findById(id).orElse(null);
-            if (valorBanco == null) {
-                throw new RuntimeException("Não localizado");
-            }
-            this.veiculoRepositorio.delete(valorBanco);
-            return ResponseEntity.ok("Veiculo Deletado.");
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
-        } catch (RuntimeException e) {
-            Veiculo valorBanco = this.veiculoRepositorio.findById(id).orElse(null);
-            if (valorBanco == null) {
-                throw new RuntimeException("Não localizado");
-            }
-            valorBanco.setAtivo(false);
-            this.veiculoRepositorio.save(valorBanco);
-            return ResponseEntity.ok("Veiculo Inativado.");
+            this.service.deletar(id);
+           return ResponseEntity.ok("Veiculo Deletado.");
+        }  catch (RuntimeException e) {
+
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
 
         }
     }

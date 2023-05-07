@@ -3,10 +3,12 @@ package br.com.uniamerica.estacionamento.controller;
 import br.com.uniamerica.estacionamento.entity.Condutor;
 import br.com.uniamerica.estacionamento.entity.Marca;
 import br.com.uniamerica.estacionamento.repository.MarcaRepositorio;
+import br.com.uniamerica.estacionamento.service.MarcaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -17,13 +19,18 @@ import java.util.List;
 
 public class MarcaController {
     @Autowired
-        public MarcaRepositorio marcaRepositorio;
+        private MarcaService service;
+    @Autowired
+    private MarcaRepositorio marcaRepositorio;
+
     @GetMapping //outra forma de buscar por id
     public ResponseEntity<?> findByIdRequest(@RequestParam("id")final Long id ){
-        final Marca marca = this.marcaRepositorio.findById(id).orElse(null);
-        return marca == null
-                ? ResponseEntity.badRequest().body("nenhum valor encontrado") :
-                ResponseEntity.ok(marca);
+        try{
+            return ResponseEntity.ok(service.buscaPorID(id));
+        }
+        catch (RuntimeException e){
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
     }
 
     @GetMapping("/lista")
@@ -33,40 +40,30 @@ public class MarcaController {
 
     @GetMapping("/listaAtiva")
     public ResponseEntity<?> retornaListaAtiva (){
-        List <Marca> listaMarca = this.marcaRepositorio.findAll();
-        List<Marca> checaLista = new ArrayList<>();
-        for (Marca valor:listaMarca
-             ) {
-            if (valor.isAtivo()){
-                checaLista.add(valor);
-            }
-
-
-        }
-        return ResponseEntity.ok(checaLista);
+       return ResponseEntity.ok(marcaRepositorio.listaMarcasAtivas());
     }
 
     @PostMapping
         public ResponseEntity<?> cadastraMarca(@RequestBody final Marca marca){
-        this.marcaRepositorio.save(marca);
-        return ResponseEntity.ok("MArca cadstrada com sucesso");
-    }
+        try{
+            service.cadastrar(marca);
+            return ResponseEntity.ok("Cadastrado com sucesso.");
+        }
+        catch (RuntimeException e){
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
+       }
+
     @PutMapping("/{id}")
         public ResponseEntity<?> atualizaMarca(@PathVariable("id") final Long id,
                                                @RequestBody final Marca marca)
     {
         try {
-            final Marca marcaBanco = this.marcaRepositorio.findById(id).orElse(null);
-            if (marcaBanco == null || !marcaBanco.getId().equals(marca.getId())){
-                throw new RuntimeException("Não foi possível localizar");
+            this.service.Atualizar(marca, id);
+            return ResponseEntity.ok("Atualuizado co Sucesso");
             }
-            this.marcaRepositorio.save(marca);
-            return ResponseEntity.ok("Marca atualizada!");
-        } catch (DataIntegrityViolationException e){
-            return  ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
-        }
         catch (RuntimeException e){
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
 
     }

@@ -5,7 +5,9 @@ import br.com.uniamerica.estacionamento.entity.Movimentacao;
 import br.com.uniamerica.estacionamento.repository.CondutorRepositorio;
 import br.com.uniamerica.estacionamento.repository.MarcaRepositorio;
 import br.com.uniamerica.estacionamento.repository.MovimentacaoRepositorio;
+import br.com.uniamerica.estacionamento.service.MovimentacaoService;
 import org.apache.catalina.connector.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,7 +25,8 @@ public class MovimentacaoController {
     //public MovimentacaoController (MovimentacaoRepositorio movimentacaoRepositorio){
     //    this.movimentacaoRepositorio = movimentacaoRepositorio;
     //}
-
+    @Autowired
+    private MovimentacaoService service;
     @GetMapping("/{id}")
     public ResponseEntity<?> buscaMovimentacao(@RequestParam("id") final Long id){
         final Movimentacao movimentacao = this.movimentacaoRepositorio.findById(id).orElse(null);
@@ -38,51 +41,36 @@ public class MovimentacaoController {
 
     @GetMapping("/listaAtiva")
     public ResponseEntity<?> listaAtivo(){
-        List<Movimentacao> listaMovimentacao = this.movimentacaoRepositorio.findAll();
-        List <Movimentacao> checaLista = new ArrayList<>();
-        for (Movimentacao valor: listaMovimentacao
-             ) {
-            if(valor.isAtivo()){
-                checaLista.add(valor);
-            }
-              }
-        return ResponseEntity.ok(checaLista) ;
+
+        return ResponseEntity.ok(movimentacaoRepositorio.listarAtivo()) ;
     }
 
     @GetMapping("/listaAtivaSemSaida")
     public ResponseEntity<?> listaAtivoSemSaida() {
-        List<Movimentacao> listaMovimentacao = this.movimentacaoRepositorio.findAll();
-        List<Movimentacao> checaLista = new ArrayList<>();
-        for (Movimentacao valor : listaMovimentacao
-        ) {
-            if (valor.getSaida().equals(null) && valor.isAtivo()) {
-                checaLista.add(valor);
-            }
 
-        }
-        return ResponseEntity.ok(listaMovimentacao);
+        return ResponseEntity.ok(movimentacaoRepositorio.listarSemSaida());
     }
 
 
     @PostMapping
         public ResponseEntity<?> cadastraMovimentacao (@RequestBody final Movimentacao movimentacao){
-        this.movimentacaoRepositorio.save(movimentacao);
-        return ResponseEntity.ok("Carro estacionado");
+      try {
+          this.service.cadastrar(movimentacao);
+          return ResponseEntity.ok("Carro estacionado");
+      }
+      catch (RuntimeException e){
+          return ResponseEntity.badRequest().body("erro: " + e.getMessage());
+      }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizaMovimentacao(@PathVariable("id") final Long id, @RequestBody final Movimentacao movimentacao) {
         try {
-            final Movimentacao movimentacaoBanco = this.movimentacaoRepositorio.findById(id).orElse(null);
-            if (movimentacaoBanco == null || !movimentacaoBanco.getId().equals(movimentacao.getId())) {
-                throw new RuntimeException("Não foi possível localizar");
-            }
-            this.movimentacaoRepositorio.save(movimentacao);
+
+            this.service.atualizar(movimentacao);
             return ResponseEntity.ok("Movimentacao atualizada!");
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
         } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().body("Error");
+            return ResponseEntity.badRequest().body("Error " + e.getMessage());
         }
     }
 
