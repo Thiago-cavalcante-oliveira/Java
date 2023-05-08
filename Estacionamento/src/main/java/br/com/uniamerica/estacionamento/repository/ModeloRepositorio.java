@@ -21,13 +21,13 @@ public interface ModeloRepositorio extends JpaRepository <Modelo, Long> {
 
     @Query("SELECT modelo from Modelo modelo")//traz a lista completa
     List<Modelo> listaModelos();
-    @Query("SELECT veiculo FROM   Veiculo veiculo where  veiculo.modelo = :id")
+    @Query("SELECT count(*)>0 FROM   Veiculo veiculo where  veiculo.modelo = :id")
     public boolean checaUso(@RequestParam("id")Long id);
 
-    @Query("SELECT modelo FROM Modelo modelo WHERE modelo.nome = :nome")//checa se o nome a ser cadastrado já existe no banco
+    @Query("SELECT count(*)>0 FROM Modelo modelo WHERE modelo.nome = :nome")//checa se o nome a ser cadastrado já existe no banco
     public boolean checaNomeModelo(@PathVariable("nome") String nome);
 
-    @Query("SELECT modelo FROM Modelo modelo where modelo.id != :id")//checa se o ID existe no banco
+    @Query("SELECT count(*)>0 FROM Modelo modelo where modelo.id != :id")//checa se o ID existe no banco
     public boolean ChecaId(@RequestParam("id")Long id);
 
 

@@ -27,7 +27,7 @@ public class CondutorService {
         } else if (condutor.getTelefone() == null) {
             throw new RuntimeException("telefone não informado");
         } else if (condutor.getTelefone().matches("([0-9]{2}\\)[0-9]{5}\\-[0-9]{4}" +
-                "|^[0-9]{11}$)")) ;{
+                "|^[0-9]{11}$)")) {
             throw new RuntimeException("Telefone inválido.");
         }
         else if (repository.cpfEmUso(condutor.getCpf())) {
