@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping(value = "/api/condutor")
 public class CondutorController {
 
@@ -26,10 +26,10 @@ public class CondutorController {
    @Autowired
    private CondutorService service;
 
-      @GetMapping //outra forma de buscar po id
-    public ResponseEntity <?> findByIdRequest(@RequestParam("id")final Long id ){
+    @GetMapping //outra forma de buscar por id
+    public ResponseEntity<?> findByIdRequest(@RequestParam("id")final Long id ){
         try{
-         return ResponseEntity.ok( this.service.BuscarPorID(id));
+            return ResponseEntity.ok(service.buscaPorId(id));
         }
         catch (RuntimeException e){
             return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
@@ -60,16 +60,14 @@ public class CondutorController {
     }
    @PutMapping
     public ResponseEntity <?> editar(
-            @RequestParam("id") Long id,
-            @RequestBody final Condutor condutor
-   ){
+            @RequestParam("id") final Long id,
+            @RequestBody final Condutor condutor){
         try {
             service.Atualizar(id,condutor);
             return ResponseEntity.ok("Atualizado.");
         }
-
        catch (RuntimeException e){
-            return ResponseEntity.internalServerError().body("Erro: "+ e.getMessage());
+            return ResponseEntity.badRequest().body("Erro: "+ e.getMessage());
        }
    }
 

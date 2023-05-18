@@ -94,31 +94,29 @@ public class MovimentacaoService {
         Duration duracaoEstacionado = Duration.between(movimentacao.getEntrada(), movimentacao.getSaida());
         tempoEstacionado = duracaoEstacionado.toMinutes();
         movimentacao.setTempo(tempoEstacionado);
-        tempoPagoCondutor = condutor.getTempoPago();
+        tempoPagoCondutor = condutor.getTempoPagoEmMinuto();
         tempoPagoCondutor += tempoEstacionado;
 
         BigDecimal valorEstacionado = new BigDecimal(tempoEstacionado);
 
-        movimentacao.setValorHora(valorEstacionado.multiply(configuracao.getValorHora()));
+        movimentacao.setValorHora(valorEstacionado.multiply(configuracao.getValorHora().divide(BigDecimal.valueOf(60))));
 
         calculaDesconto = (tempoPagoCondutor / configuracao.getTempoParaGerarDesconto())*configuracao.getTempoDeCreditoDesconto();
+        calculaDesconto = calculaDesconto/60;
         tempoPagoCondutor = (tempoPagoCondutor % configuracao.getTempoParaGerarDesconto());
 
-
         condutor.setTempoDesconto(calculaDesconto);
-        condutor.setTempoPago(tempoPagoCondutor);
+        condutor.setTempoPagoEmMinuto(tempoPagoCondutor);
         condutorRepositorio.save(condutor);
         repository.save(movimentacao);
-
-
     }
 
-    public void calculaMulta(Long id, Movimentacao sair) {
+    public String calculaMulta(Long id, Movimentacao sair) {
         Long multaEntrada = 0L, multaSaida = 0L, somaTempo = 0L;
-
         Movimentacao movimentacao = this.repository.getById(id);
         movimentacao.setSaida(sair.getSaida());
         repository.save(movimentacao);
+        Condutor condutor = this.condutorRepositorio.getReferenceById(movimentacao.getCondutor().getId());
 
         LocalTime entrada = movimentacao.getEntrada().toLocalTime();
         LocalTime saida = movimentacao.getSaida().toLocalTime();
@@ -144,24 +142,45 @@ public class MovimentacaoService {
         if (dias > 0) {
             Long tempoExpediente = Duration.between(configuracao.getInicioExpediente(), configuracao.getFimExpediente()).toMinutes();
             somaTempo += dias * 24 * 60 - tempoExpediente * dias;
-
         }
 
         BigDecimal somaTempoMulta = new BigDecimal(somaTempo);
+        BigDecimal multiplicadorMulta = new BigDecimal(60);
 
         BigDecimal valorMulta = somaTempoMulta.multiply(configuracao.getValorMinutoMulta());
         movimentacao.setValorMulta(valorMulta);
+        if (somaTempoMulta.equals(0)){
+            multiplicadorMulta.add(BigDecimal.valueOf(0));
+        }
 
-        movimentacao.setValorTotal(valorMulta.add(movimentacao.getValorHora()));
+        movimentacao.setTempoDesconto(condutor.getTempoDesconto());
+        movimentacao.setValorDesconto(configuracao.getValorHora().multiply(BigDecimal.valueOf(condutor.getTempoDesconto())));
 
-
+        movimentacao.setValorTotal(valorMulta.add(movimentacao.getValorHora()).subtract(movimentacao.getValorDesconto()));
 
         movimentacao.setTempoMulta(somaTempo);
-        movimentacao.setValorHoraMulta(valorMulta.divide(BigDecimal.valueOf(60)));
+        movimentacao.setValorHoraMulta(configuracao.getValorMinutoMulta().multiply(multiplicadorMulta));
         repository.save(movimentacao);
+
+        return "----------------------------------\n"+
+                "+++++++CUPOM FISCAL+++++++\n" +
+                "|CONDUTOR: "+ movimentacao.getCondutor().getNome()+"\n" +
+                "|VEICULO: " + movimentacao.getVeiculo().getModelo().getNome() + " PLACA: " + movimentacao.getVeiculo().getPlaca()+ "\n" +
+                "__________________________________\n" +
+                "DATA DE ENTRADA: " + movimentacao.getEntrada().getDayOfMonth() +"/" + movimentacao.getEntrada().getMonthValue() + "/" + movimentacao.getEntrada().getYear() +
+                "  HORA DE ENTRADA: " + movimentacao.getEntrada().getHour() + ":" + movimentacao.getEntrada().getMinute() +"\n" +
+                "\nDATA DE SAÍDA: " + movimentacao.getSaida().getDayOfMonth() + "/" + movimentacao.getSaida().getMonthValue()+ "/" + movimentacao.getSaida().getYear() +"\n"+
+                "  HORA DE SAIDA: " + movimentacao.getSaida().getHour()+":"+movimentacao.getSaida().getMinute() +
+                "----------------------------------\n" +
+                "|TEMPO ESTACIONADO EM MINUTOS: " + movimentacao.getTempo() + "\n"+
+                "|VALOR DO TEMPO ESTACIONADO: R$ " + movimentacao.getValorHora() + "\n" +
+                "|TEMPO DE MULTA GERADO: " + movimentacao.getTempoMulta() +"\n"+
+                "|VALOR DA MULTA: R$ " + movimentacao.getValorMulta() +"\n"+
+                "|VALOR DE DESCONTO: R$ " + movimentacao.getValorDesconto() +"\n"+
+                "|VALOR TOTAL: R$ " + movimentacao.getValorTotal()+ "\n"+
+                "-----------------------------------\n"+
+                "==========VOLTE SEMPRE=============";
 
 
     }
-
-
 }

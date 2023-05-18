@@ -29,9 +29,9 @@ public class Condutor extends Entitty {
     private String telefone;
     @Getter
     @Setter
-    @Column(name = "tempo_pago", nullable = false)
+    @Column(name = "tempo_pago_minuto", nullable = false)
 
-    private Long tempoPago;
+    private Long tempoPagoEmMinuto;
     @Getter
     @Setter
     @Column(name = "tempo_desconto", nullable = false)

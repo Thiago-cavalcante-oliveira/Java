@@ -38,11 +38,11 @@ public class ConfiguracaoController {
         }
        }
 
-    @PutMapping("/{id}")
-    public  ResponseEntity <?> editaConfiguracao(@PathVariable final Long id, @RequestBody Configuracao configuracao){
+    @PutMapping
+    public  ResponseEntity <?> editaConfiguracao(@RequestParam final Long id, @RequestBody Configuracao configuracao){
        try{
            this.service.atualizar(id, configuracao);
-           return ResponseEntity.ok("Configuracao cadastrada com sucesso.");
+           return ResponseEntity.ok("Configuracao Atualizada com sucesso.");
        }  catch (RuntimeException e) {
            return ResponseEntity.badRequest().body("Error " + e.getMessage());
        }

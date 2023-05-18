@@ -35,7 +35,7 @@ public class Movimentacao extends Entitty {
     @Getter
     @Setter
     @Column(name = "ds-tempo-desconto")
-    private LocalTime tempoDesconto;
+    private Long tempoDesconto;
     @Getter
     @Setter
     @Column(name = "ds-tempo-multa")

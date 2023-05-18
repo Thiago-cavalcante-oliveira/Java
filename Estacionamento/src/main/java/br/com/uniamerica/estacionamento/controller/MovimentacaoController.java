@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping(value = "/api/movimentacao")
 
 public class MovimentacaoController {
@@ -87,8 +87,8 @@ public class MovimentacaoController {
     public ResponseEntity<?> finalizarEstacionamento(@RequestParam("id") Long id,
                                                      @RequestBody Movimentacao sair){
         service.calculaTempoEstacionado(id, sair);
-        service.calculaMulta(id, sair);
-        return ResponseEntity.ok("finalizado");
+
+        return ResponseEntity.ok(service.calculaMulta(id, sair));
     }
 
 

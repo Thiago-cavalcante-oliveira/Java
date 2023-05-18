@@ -1,8 +1,10 @@
 package br.com.uniamerica.estacionamento.service;
 
 import br.com.uniamerica.estacionamento.entity.Condutor;
+import br.com.uniamerica.estacionamento.entity.Marca;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
 import br.com.uniamerica.estacionamento.repository.CondutorRepositorio;
+import br.com.uniamerica.estacionamento.repository.MovimentacaoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,8 @@ public class CondutorService {
 
     @Autowired
     private CondutorRepositorio repository;
+    @Autowired
+    private MovimentacaoRepositorio movimentacaoRepositorio;
 
     @Transactional(rollbackFor =  Exception.class)
     public void cadastrar(final Condutor condutor) {
@@ -39,56 +43,48 @@ public class CondutorService {
     }
 
     public void Atualizar(final Long id, final Condutor condutor){
+
         if(!id.equals(condutor.getId())){
             throw new RuntimeException("Erro no Id do condutor");
-        }
-        else if(condutor.getNome() == null || condutor.getNome().isEmpty()){
+        } else if(condutor.getNome() == null || condutor.getNome().isEmpty()){
             throw new RuntimeException("Nome não informado");
         } else if (condutor.getCpf() == null || condutor.getCpf().isEmpty()){
-
-                    throw new RuntimeException("cpf não informado");
-
+            throw new RuntimeException("cpf não informado");
         } else if (!isCPF(condutor.getCpf())) {
             throw new RuntimeException("CPF Iválido.");
         } else if (condutor.getTelefone() == null || condutor.getTelefone().isEmpty()){
             throw new RuntimeException("telefone não informado");
-        }
-        else if (repository.cpfEmUso(condutor.getCpf())) {
+        } else if (repository.cpfEmUso(condutor.getCpf())) {
             if (condutor.getId() != id) {
                 throw new RuntimeException("cpf já está cadastrado.");
             }
-        }
-        else if (repository.TelefoneEmUso(condutor.getTelefone())) {
+        } else if (repository.TelefoneEmUso(condutor.getTelefone())) {
             throw new RuntimeException("telefone já está cadastrado.");
-        }
-        else if (!condutor.isAtivo()) {
+        } else if (!condutor.isAtivo()) {
             throw new RuntimeException("Não pode ser Inativo ao Atualizar.");
-        }else
-            repository.save(condutor);
+        }
+            this.repository.save(condutor);
     }
 
     public void deletar(final Long id) {
-        if (repository.checaUso(id)) {
-            Optional<Condutor> optionalCondutor = this.repository.findById(id);
-            if (optionalCondutor.isPresent()) {
-                Condutor condutor = optionalCondutor.get();
+        Condutor condutor = this.repository.getById(id);
+        if(movimentacaoRepositorio.existsById(condutor.getId())){
+
                 condutor.setAtivo(false);
                 this.repository.save(condutor);
             } else {
-                this.repository.deleteById(id);
+                this.repository.delete(condutor);
             }
         }
-    }
-    public Optional<Condutor> BuscarPorID(final Long id){
-        if(id == null){
-            throw new RuntimeException("Você não informou um id para consultar.");
+
+    public Optional<Condutor> buscaPorId(final Long id) {
+        if (id == null) {
+            throw new RuntimeException("Id não informado.");
+        } else if (!repository.checaId(id)) {
+            throw new RuntimeException("Id não existe na base de dados");
         }
-        else if (!repository.checaId(id)){
-            throw new RuntimeException("ID não localizado.");
-        }
-        else{
-            Optional<Condutor> condutor = this.repository.findById(id);
-            return condutor;}
+        Optional<Condutor> condutor = this.repository.findById(id);
+        return condutor;
     }
 
 
