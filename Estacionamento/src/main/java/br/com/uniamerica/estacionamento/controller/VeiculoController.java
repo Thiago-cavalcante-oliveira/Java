@@ -29,8 +29,9 @@ public class VeiculoController {
 
     @GetMapping
     public ResponseEntity<?> buscaVeiculoPorId(@RequestParam("id") final Long id) {
+        Veiculo veiculo = this.veiculoRepositorio.findById(id).orElse(null);
         try {
-            return ResponseEntity.ok(veiculoRepositorio.checaId(id));
+            return ResponseEntity.ok(veiculo);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("Erro:" + e.getMessage());
         }
@@ -56,8 +57,8 @@ public class VeiculoController {
             return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
-    @PutMapping("/{id}")
-        public ResponseEntity<?> atualizar(@PathVariable("id") final Long id,
+    @PutMapping
+        public ResponseEntity<?> atualizar(@RequestParam("id") final Long id,
         @RequestBody final Veiculo veiculo){
         try {
             this.service.Atualizar(id, veiculo);
@@ -68,8 +69,8 @@ public class VeiculoController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> atualizaVeiculo(@PathVariable final Long id) {
+    @DeleteMapping
+    public ResponseEntity<?> atualizaVeiculo(@RequestParam final Long id) {
         try {
             this.service.deletar(id);
            return ResponseEntity.ok("Veiculo Deletado.");

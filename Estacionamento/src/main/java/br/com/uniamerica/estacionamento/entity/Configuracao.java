@@ -20,7 +20,7 @@ public class Configuracao extends Entitty{
     private BigDecimal valorHora;
     @Getter @Setter
     @Column(name = "vl_minuto_multa", nullable = false)
-    private BigDecimal valorMinutoHora;
+    private BigDecimal valorMinutoMulta;
     @Getter @Setter
     @Column(name = "inicio_atendimento", nullable = false)
     private LocalTime inicioExpediente;
@@ -29,10 +29,10 @@ public class Configuracao extends Entitty{
     private LocalTime fimExpediente;
     @Getter @Setter
     @Column(name = "num_gera_desconto", nullable = false)
-    private LocalTime tempoParaDesconto;
+    private Long tempoParaGerarDesconto;
     @Getter @Setter
     @Column(name = "num_tempo_desconto", nullable = false)
-    private LocalTime tempoDeDesconto;
+    private Long tempoDeCreditoDesconto;
     @Getter @Setter
     @Column(name = "st_gerar_desconto", nullable = false)
     private boolean gerarDesconto;
@@ -45,6 +45,9 @@ public class Configuracao extends Entitty{
     @Getter @Setter
     @Column(name = "num_vaga_van", nullable = false)
     private int vagasVan;
+    @Getter @Setter
+    @Column(name ="nm_versao", nullable = false, unique = true)
+    static int versao = 1;
 
 
 

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Table(name = "veiculos", schema = "public")
 public class Veiculo extends Entitty{
     @Getter @Setter
-    @Column(name = "num_placa_veiculo", nullable = false, length = 7)
+    @Column(name = "num_placa_veiculo", nullable = false, length = 10)
     private String placa;
     @Getter @Setter
     @JoinColumn(name = "co_modelo", nullable = false)

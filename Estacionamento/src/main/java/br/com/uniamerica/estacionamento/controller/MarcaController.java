@@ -26,7 +26,7 @@ public class MarcaController {
     @GetMapping //outra forma de buscar por id
     public ResponseEntity<?> findByIdRequest(@RequestParam("id")final Long id ){
         try{
-            return ResponseEntity.ok(service.buscaPorID(id));
+            return ResponseEntity.ok(service.buscaPorId(id));
         }
         catch (RuntimeException e){
             return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
@@ -54,8 +54,8 @@ public class MarcaController {
         }
        }
 
-    @PutMapping("/{id}")
-        public ResponseEntity<?> atualizaMarca(@PathVariable("id") final Long id,
+    @PutMapping
+        public ResponseEntity<?> atualizaMarca(@RequestParam("id") final Long id,
                                                @RequestBody final Marca marca)
     {
         try {
@@ -68,27 +68,14 @@ public class MarcaController {
 
     }
 
-    @DeleteMapping ("/{id}")
-    public ResponseEntity <?> inativar(@PathVariable("id") Long id){
+    @DeleteMapping
+    public ResponseEntity <?> inativar(@RequestParam("id") final Long id){
         try {
-            final Marca marcaBanco = this.marcaRepositorio.findById(id).orElse(null);
-            if (marcaBanco == null ){
-                throw new RuntimeException("Não foi possível identificar o registro");
-            }
-            this.marcaRepositorio.delete(marcaBanco);
-            return ResponseEntity.ok("Registro Deletado");
-        }
-        catch (DataIntegrityViolationException e){
-            return  ResponseEntity.internalServerError().body("Error"+e + e.getCause().getCause().getMessage());
-        }
-        catch (Exception e){
-            final Marca marcaBanco = this.marcaRepositorio.findById(id).orElse(null);
-            if (marcaBanco == null ){
-                throw new RuntimeException("Não foi possível identificar o registro");
-            }
-            marcaBanco.setAtivo(false);
-            this.marcaRepositorio.save(marcaBanco);
-            return ResponseEntity.ok("Registro Inativado");
+            this.service.deletar(id);
+            return  ResponseEntity.ok("Marca deletada.");
+         }
+         catch (Exception e){
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
 
     }

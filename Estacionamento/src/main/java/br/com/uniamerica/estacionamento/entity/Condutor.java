@@ -31,11 +31,11 @@ public class Condutor extends Entitty {
     @Setter
     @Column(name = "tempo_pago", nullable = false)
 
-    private LocalTime tempoPago;
+    private Long tempoPago;
     @Getter
     @Setter
     @Column(name = "tempo_desconto", nullable = false)
-    private LocalTime tempoDesconto;
+    private Long tempoDesconto;
 }
 
 

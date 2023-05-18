@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import java.util.List;
 @RequestMapping(value = "/api/movimentacao")
 
 public class MovimentacaoController {
-
+@Autowired
     private MovimentacaoRepositorio movimentacaoRepositorio;
     //public MovimentacaoController (MovimentacaoRepositorio movimentacaoRepositorio){
     //    this.movimentacaoRepositorio = movimentacaoRepositorio;
@@ -73,6 +74,23 @@ public class MovimentacaoController {
             return ResponseEntity.badRequest().body("Error " + e.getMessage());
         }
     }
+
+
+    @PutMapping
+    public ResponseEntity<?> finalizaEstacionamento(@RequestParam("id") Long id, @RequestBody LocalDateTime finalizar){
+
+    return ResponseEntity.ok("Finalizado estacionamento.");
+
+    }
+
+    @PatchMapping
+    public ResponseEntity<?> finalizarEstacionamento(@RequestParam("id") Long id,
+                                                     @RequestBody Movimentacao sair){
+        service.calculaTempoEstacionado(id, sair);
+        service.calculaMulta(id, sair);
+        return ResponseEntity.ok("finalizado");
+    }
+
 
     @DeleteMapping ("/{id}")
     public ResponseEntity <?> inativar(@PathVariable("id") Long id){

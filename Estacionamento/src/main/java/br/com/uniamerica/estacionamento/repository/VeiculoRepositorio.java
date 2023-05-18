@@ -14,18 +14,21 @@ import java.util.List;
 
 public interface VeiculoRepositorio extends JpaRepository <Veiculo, Long> {
 
-    @Query("select veiculo from Veiculo veiculo where veiculo.id != :id")
+    @Query("select count(*)>0 from Veiculo veiculo where veiculo.id = :id")
     public boolean checaId(@RequestParam("id")Long id);
     @Query("select marca from Marca marca")
     public List<Marca> listar();
 
     @Query("select veiculo from Veiculo veiculo where veiculo.ativo = true")
     public List<Marca> listarAtivos();
-    @Query("select veiculo from Veiculo veiculo where veiculo.placa = :placa")
-    public boolean checaPlaca(@PathVariable("placa") String placa);
+    @Query("select count(*)>0 from Veiculo veiculo where veiculo.placa = :placa")
+    public boolean checaPlaca(@RequestParam("placa") String placa);
 
-    @Query("select movimentacao from Movimentacao movimentacao where movimentacao.veiculo = :id")
+    @Query("select count(*)>0 from Movimentacao movimentacao where movimentacao.veiculo = :id")
     public boolean checaUso(@RequestParam("id") Long id);
+
+    @Query("select veiculo.id from Veiculo veiculo where veiculo.placa = :placa")
+    public Long checaUsoRetornaId(@RequestParam("placa") String placa);
 
 }
 

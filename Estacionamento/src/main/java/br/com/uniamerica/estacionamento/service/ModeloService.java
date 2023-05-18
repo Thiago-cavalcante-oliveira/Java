@@ -1,6 +1,7 @@
 package br.com.uniamerica.estacionamento.service;
 
 import br.com.uniamerica.estacionamento.entity.Modelo;
+import br.com.uniamerica.estacionamento.repository.MarcaRepositorio;
 import br.com.uniamerica.estacionamento.repository.ModeloRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,16 +13,18 @@ import java.util.Optional;
 public class ModeloService  {
     @Autowired
     private ModeloRepositorio repository;
+    @Autowired
+    private MarcaRepositorio marcaRepositorio;
 
     @Transactional(rollbackFor = Exception.class)//abre uma transacao dentro de uma transacao
     public void cadastrarModelo(final Modelo modelo){
-        if (modelo.getNome().isEmpty()){
+        if (modelo.getNome() == null || modelo.getNome().isEmpty()){
             throw new RuntimeException("Nome do condutor não informado");
         } else if (repository.checaNomeModelo(modelo.getNome())){
                 throw new RuntimeException("Modelo já está cadastrado.");
-        } else if (!modelo.isAtivo()) {
-            throw new RuntimeException("Condutor não pode ser Inativo");
-              }
+        } else if (!marcaRepositorio.existsById(modelo.getMarca().getId())) {
+            throw new RuntimeException("O ID da Marca não está cadastrado.");
+        }
         repository.save(modelo);
     }
 
@@ -29,13 +32,20 @@ public class ModeloService  {
     public void AtualizarModelo(final Modelo modelo, final Long id){
         if (id != modelo.getId()){
             throw new RuntimeException("Houve um erro: o id informado é diferente do ID do modelo");
-        } else if (repository.ChecaId(id)) {
+        }
+        else if (!repository.ChecaId(id)) {
             throw new RuntimeException("ID não encontrado na base de dados");
-                    } else if(modelo.getNome().isEmpty()){
-            throw new RuntimeException("Nome do Condutor não informado.");
-        } else if (repository.checaNomeModelo(modelo.getNome())) {
+        }
+        else if(modelo.getNome() == null || modelo.getNome().isEmpty()){
+            throw new RuntimeException("Nome do modelo não informado.");
+        }
+        else if (!marcaRepositorio.existsById(modelo.getMarca().getId())) {
+            throw new RuntimeException("O ID da Marca não existe");
+        }
+        else if (repository.checaNomeModelo(modelo.getNome())) {
             throw new RuntimeException("Este modelo já está cadastrado.");
-        } else if (!modelo.isAtivo()) {
+        }
+        else if (!modelo.isAtivo()) {
             throw new RuntimeException("Este modelo está desativado.");
            }
         repository.save(modelo);
@@ -54,19 +64,19 @@ public class ModeloService  {
     }
 
     public void deletar(final Long id) {
+        Modelo modelo = this.repository.findById(id).orElse(null);
         if (id == null) {
             throw new RuntimeException("ID não informado.");
-        } else if (repository.ChecaId(id)) {
+        } else if (!repository.ChecaId(id)) {
             throw new RuntimeException("ID não encontrado na base de dados.");
         } else if (repository.checaUso(id)) {
-            Optional<Modelo> modelo = this.repository.findById(id);
-            if (modelo.isPresent()) {
-                modelo.get().setAtivo(false);
+                modelo.setAtivo(false);
+                repository.save(modelo);
             } else {
-                repository.deleteById(id);
+                repository.delete(modelo);
             }
         }
             }
 
 
-}
+

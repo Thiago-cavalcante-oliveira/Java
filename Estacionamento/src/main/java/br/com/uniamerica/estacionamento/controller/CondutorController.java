@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(value = "/api/condutor")
@@ -57,24 +58,18 @@ public class CondutorController {
             return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
-   @PutMapping("/{id}")
+   @PutMapping
     public ResponseEntity <?> editar(
-            @PathVariable("id") Long id,
+            @RequestParam("id") Long id,
             @RequestBody final Condutor condutor
    ){
         try {
-            final Condutor condutorBanco = this.condutorRepositorio.findById(id).orElse(null);
-            if (condutorBanco == null || !condutorBanco.getId().equals(condutor.getId())){
-            throw new RuntimeException("Não foi possível identificar o registro");
+            service.Atualizar(id,condutor);
+            return ResponseEntity.ok("Atualizado.");
         }
-        this.condutorRepositorio.save(condutor);
-        return ResponseEntity.ok("Registro Atualizado");
-        }
-        catch (DataIntegrityViolationException e){
-            return  ResponseEntity.internalServerError().body("Error" + e.getCause().getCause().getMessage());
-        }
+
        catch (RuntimeException e){
-            return ResponseEntity.internalServerError().body("Error");
+            return ResponseEntity.internalServerError().body("Erro: "+ e.getMessage());
        }
    }
 
@@ -82,28 +77,16 @@ public class CondutorController {
 
     @DeleteMapping ("/{id}")
     public ResponseEntity <?> inativar(@PathVariable("id") Long id){
-       try {
-            final Condutor condutorBanco = this.condutorRepositorio.findById(id).orElse(null);
-            if (condutorBanco == null ){
-                throw new RuntimeException("Não foi possível identificar o registro");
-           }
-            this.condutorRepositorio.delete(condutorBanco);
-            return ResponseEntity.ok("Registro Deletado");
-        }
-        catch (DataIntegrityViolationException e){
-            return  ResponseEntity.internalServerError().body("Error"+e + e.getCause().getCause().getMessage());
-        }
-        catch (Exception e){
-            final Condutor condutorBanco = this.condutorRepositorio.findById(id).orElse(null);
-            if (condutorBanco == null ){
-                throw new RuntimeException("Não foi possível identificar o registro");
-            }
-            condutorBanco.setAtivo(false);
-            this.condutorRepositorio.save(condutorBanco);
-            return ResponseEntity.ok("Registro Inativado");
-        }
-
+      try{
+          this.service.deletar(id);
+          return ResponseEntity.ok("Deletado com sucesso.");
+      }
+      catch (RuntimeException e){
+          return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+      }
     }
+
+
 
 
 

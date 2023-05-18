@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(value = "/api/modelo")
@@ -27,8 +28,10 @@ public class ModeloController {
 
     @GetMapping
     public ResponseEntity<?> buscarModelo(@RequestParam("id") final Long id){
+
         try{
-        return ResponseEntity.ok(service.BuscarPorID(id));
+            Optional<Modelo> modelo = repository.findById(id);
+        return ResponseEntity.ok(modelo);
             }
         catch (RuntimeException e){
           return  ResponseEntity.badRequest().body("Erro: " + e.getMessage());
@@ -46,7 +49,7 @@ public class ModeloController {
          }
 
     @PostMapping
-    public ResponseEntity<?> cadastrarModelo(@PathVariable Modelo modelo){
+    public ResponseEntity<?> cadastrarModelo(@RequestBody Modelo modelo){
         try{
             this.service.cadastrarModelo(modelo);
            return ResponseEntity.ok("Modelo cadastrado com sucesso");
@@ -56,20 +59,19 @@ public class ModeloController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> atualizaModelo(@PathVariable final Long id, @RequestBody Modelo modelo) {
+    @PutMapping
+    public ResponseEntity<?> atualizaModelo (@RequestBody Modelo modelo, @RequestParam final Long id) {
         try {
             this.service.AtualizarModelo(modelo,id);
+
             return ResponseEntity.ok("Modelo Atualizado com sucesso.") ;
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body("Error" + e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().body("Error");
+        }  catch (RuntimeException e) {
+            return ResponseEntity.internalServerError().body("Erro inesperado." + e.getMessage());
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluiModelo(@PathVariable final Long id) {
+    @DeleteMapping
+    public ResponseEntity<?> excluiModelo(@RequestParam final Long id) {
 
         try {
 
