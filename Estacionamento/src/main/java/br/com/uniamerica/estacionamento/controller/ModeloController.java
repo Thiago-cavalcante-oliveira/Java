@@ -27,45 +27,42 @@ public class ModeloController {
 
 
     @GetMapping
-    public ResponseEntity<?> buscarModelo(@RequestParam("id") final Long id){
+    public ResponseEntity<?> buscarModelo(@RequestParam("id") final Long id) {
 
-        try{
-            Optional<Modelo> modelo = repository.findById(id);
-        return ResponseEntity.ok(modelo);
-            }
-        catch (RuntimeException e){
-          return  ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        try {
+            return ResponseEntity.ok(service.BuscarPorID(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
 
     @GetMapping("/lista")
-    public ResponseEntity<?> buscaListaModelo(){
-                return ResponseEntity.ok(repository.findAll());
-            }
+    public ResponseEntity<?> buscaListaModelo() {
+        return ResponseEntity.ok(repository.findAll());
+    }
 
     @GetMapping("/listaativo")
-    public ResponseEntity<?> buscaListaAtivo(){
+    public ResponseEntity<?> buscaListaAtivo() {
         return ResponseEntity.ok(repository.modeloAtivo());
-         }
+    }
 
     @PostMapping
-    public ResponseEntity<?> cadastrarModelo(@RequestBody Modelo modelo){
-        try{
+    public ResponseEntity<?> cadastrarModelo(@RequestBody Modelo modelo) {
+        try {
             this.service.cadastrarModelo(modelo);
-           return ResponseEntity.ok("Modelo cadastrado com sucesso");
-        }
-        catch (RuntimeException e){
-           return ResponseEntity.badRequest().body("Erro: "+ e.getMessage());
+            return ResponseEntity.ok("Modelo cadastrado com sucesso");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
 
     @PutMapping
-    public ResponseEntity<?> atualizaModelo (@RequestBody Modelo modelo, @RequestParam final Long id) {
+    public ResponseEntity<?> atualizaModelo(@RequestBody Modelo modelo, @RequestParam final Long id) {
         try {
-            this.service.AtualizarModelo(modelo,id);
+            this.service.AtualizarModelo(modelo, id);
 
-            return ResponseEntity.ok("Modelo Atualizado com sucesso.") ;
-        }  catch (RuntimeException e) {
+            return ResponseEntity.ok("Modelo Atualizado com sucesso.");
+        } catch (RuntimeException e) {
             return ResponseEntity.internalServerError().body("Erro inesperado." + e.getMessage());
         }
     }
@@ -77,11 +74,10 @@ public class ModeloController {
 
             this.service.deletar(id);
             return ResponseEntity.ok("Modelo deletado com sucesso.");
-        } catch (RuntimeException e){
-            return  ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
-
 
 
 }

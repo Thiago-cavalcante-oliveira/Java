@@ -61,4 +61,12 @@ public class Movimentacao extends Entitty {
     @Column(name = "ds-valor-hora-multa")
     private BigDecimal valorHoraMulta;
 
+    @Getter
+    @Setter
+    @JoinColumn(name = "co_configuracao")
+    @OneToOne
+    private Configuracao configuracao;
+
+
+
 }

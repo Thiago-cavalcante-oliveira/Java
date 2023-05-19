@@ -12,6 +12,8 @@ import java.util.List;
 public interface MovimentacaoRepositorio extends JpaRepository <Movimentacao, Long> {
     @Query("select movi from Movimentacao movi where movi.ativo = true")
     public List<Movimentacao> listarAtivo();
+    @Query("select count(*)>0 from Movimentacao movimentcao where movimentcao.id = :id")
+    public boolean checaMovimentacao(@RequestParam("id")Long id);
 
     @Query("select movi from Movimentacao movi where movi.ativo = true and movi.saida = null")
     public List<Movimentacao> listarSemSaida();

@@ -43,11 +43,11 @@ public class MovimentacaoService {
         } else if (movimentacao.getEntrada() == null) {
             throw new RuntimeException("Entrada nao informado.");
         } else if (repository.existsById(movimentacao.getVeiculo().getId())
-                && repository.checaCarroEstacionado(movimentacao.getVeiculo().getId())) {
+                && movimentacao.getSaida() == null) {
             throw new RuntimeException("Veiculo já está estacionado.");
-        } else {
-            repository.save(movimentacao);
         }
+        repository.save(movimentacao);
+
     }
 
     public void atualizar(final Movimentacao movimentacao) {
@@ -65,31 +65,43 @@ public class MovimentacaoService {
             throw new RuntimeException("Veiculo inativo");
         } else if (movimentacao.getEntrada() == null) {
             throw new RuntimeException("Entrada nao informado.");
-        } else {
-            repository.save(movimentacao);
+        } else if (repository.existsById(movimentacao.getVeiculo().getId())
+                && movimentacao.getSaida() == null) {
+            throw new RuntimeException("Veiculo já está estacionado.");
         }
+        repository.save(movimentacao);
+
     }
 
-    public void deletar(@PathVariable("id") Long id) {
+    public void deletar(@RequestParam("id") Long id) {
+        Movimentacao movimentacao = this.repository.findById(id).orElse(null);
+
         if (id == null) {
             throw new RuntimeException("ID não informado.");
-        } else {
-            Optional<Movimentacao> movimentacao = this.repository.findById(id);
-            if (movimentacao.isPresent()) {
-                Movimentacao checamovimentacao = movimentacao.get();
-                checamovimentacao.setAtivo(false);
-                this.repository.save(checamovimentacao);
-            }
-
+        } else if (!repository.checaMovimentacao(id)) {
+            throw new RuntimeException("Id da movimentacao não localizado");
+        } else if (repository.checaMovimentacao(id)) {
+            movimentacao.setAtivo(false);
+            this.repository.save(movimentacao);
         }
+        repository.delete(movimentacao);
+
     }
 
     public void calculaTempoEstacionado(Long id, Movimentacao saida) {
-        Long calculaDesconto, tempoEstacionado, tempoPagoCondutor;
+        Long calculaDesconto, calculaHoraEstacionado, tempoEstacionado, tempoPagoCondutor;
         Configuracao configuracao = this.configuracaoRepositorio.getById(1L);
         Movimentacao movimentacao = this.repository.getById(id);
         movimentacao.setSaida(saida.getSaida());
         Condutor condutor = movimentacao.getCondutor();
+
+        if (movimentacao.getSaida() == null) {
+            throw new RuntimeException("Vc precisa informar a data e hora da saída.");
+        } else if (movimentacao.getSaida().isBefore(movimentacao.getEntrada())) {
+            throw new RuntimeException("A saída não pode ser anterior a entrada.");
+        } else if (!configuracaoRepositorio.checaConfiguracaoAtiva() ) {
+            throw new RuntimeException("Nã há uma configuracao ativa, favor configurar o sistemas antes de concluir o estacionamento.");
+        }
 
         Duration duracaoEstacionado = Duration.between(movimentacao.getEntrada(), movimentacao.getSaida());
         tempoEstacionado = duracaoEstacionado.toMinutes();
@@ -100,13 +112,15 @@ public class MovimentacaoService {
         BigDecimal valorEstacionado = new BigDecimal(tempoEstacionado);
 
         movimentacao.setValorHora(valorEstacionado.multiply(configuracao.getValorHora().divide(BigDecimal.valueOf(60))));
+        calculaHoraEstacionado = tempoPagoCondutor / 60;
 
-        calculaDesconto = (tempoPagoCondutor / configuracao.getTempoParaGerarDesconto())*configuracao.getTempoDeCreditoDesconto();
-        calculaDesconto = calculaDesconto/60;
+        calculaDesconto = (calculaHoraEstacionado / configuracao.getTempoParaGerarDesconto()) * configuracao.getTempoDeCreditoDesconto();
+        //calculaDesconto = calculaDesconto/60;
         tempoPagoCondutor = (tempoPagoCondutor % configuracao.getTempoParaGerarDesconto());
 
-        condutor.setTempoDesconto(calculaDesconto);
+        condutor.setTempoPagoEmHora(calculaHoraEstacionado);
         condutor.setTempoPagoEmMinuto(tempoPagoCondutor);
+        condutor.setTempoDesconto(calculaDesconto);
         condutorRepositorio.save(condutor);
         repository.save(movimentacao);
     }
@@ -149,7 +163,7 @@ public class MovimentacaoService {
 
         BigDecimal valorMulta = somaTempoMulta.multiply(configuracao.getValorMinutoMulta());
         movimentacao.setValorMulta(valorMulta);
-        if (somaTempoMulta.equals(0)){
+        if (somaTempoMulta.equals(0)) {
             multiplicadorMulta.add(BigDecimal.valueOf(0));
         }
 
@@ -162,23 +176,25 @@ public class MovimentacaoService {
         movimentacao.setValorHoraMulta(configuracao.getValorMinutoMulta().multiply(multiplicadorMulta));
         repository.save(movimentacao);
 
-        return "----------------------------------\n"+
+        return "----------------------------------\n" +
                 "+++++++CUPOM FISCAL+++++++\n" +
-                "|CONDUTOR: "+ movimentacao.getCondutor().getNome()+"\n" +
-                "|VEICULO: " + movimentacao.getVeiculo().getModelo().getNome() + " PLACA: " + movimentacao.getVeiculo().getPlaca()+ "\n" +
+                "|CONDUTOR: " + movimentacao.getCondutor().getNome() + "\n" +
+                "|VEICULO: " + movimentacao.getVeiculo().getModelo().getNome() + " PLACA: " + movimentacao.getVeiculo().getPlaca() + "\n" +
+                "|TEMPO PARA USO EM DESCONTO: " + movimentacao.getCondutor().getTempoDesconto() + "\n" +
                 "__________________________________\n" +
-                "DATA DE ENTRADA: " + movimentacao.getEntrada().getDayOfMonth() +"/" + movimentacao.getEntrada().getMonthValue() + "/" + movimentacao.getEntrada().getYear() +
-                "  HORA DE ENTRADA: " + movimentacao.getEntrada().getHour() + ":" + movimentacao.getEntrada().getMinute() +"\n" +
-                "\nDATA DE SAÍDA: " + movimentacao.getSaida().getDayOfMonth() + "/" + movimentacao.getSaida().getMonthValue()+ "/" + movimentacao.getSaida().getYear() +"\n"+
-                "  HORA DE SAIDA: " + movimentacao.getSaida().getHour()+":"+movimentacao.getSaida().getMinute() +
+                "DATA DE ENTRADA: " + movimentacao.getEntrada().getDayOfMonth() + "/" + movimentacao.getEntrada().getMonthValue() + "/" + movimentacao.getEntrada().getYear() +
+                "  HORA DE ENTRADA: " + movimentacao.getEntrada().getHour() + ":" + movimentacao.getEntrada().getMinute() + "\n" +
+                " \nDATA DE SAÍDA: " + movimentacao.getSaida().getDayOfMonth() + "/" + movimentacao.getSaida().getMonthValue() + "/" + movimentacao.getSaida().getYear() +
+                "|HORA DE SAIDA: " + movimentacao.getSaida().getHour() + ":" + movimentacao.getSaida().getMinute() + "\n" +
                 "----------------------------------\n" +
-                "|TEMPO ESTACIONADO EM MINUTOS: " + movimentacao.getTempo() + "\n"+
+                "|TEMPO ESTACIONADO: " + movimentacao.getTempo() / 60 + " HORAS+" + "\n" +
+                "|VALOR DA HORA NORMAL: R$ " + configuracao.getValorHora() + "\n" +
                 "|VALOR DO TEMPO ESTACIONADO: R$ " + movimentacao.getValorHora() + "\n" +
-                "|TEMPO DE MULTA GERADO: " + movimentacao.getTempoMulta() +"\n"+
-                "|VALOR DA MULTA: R$ " + movimentacao.getValorMulta() +"\n"+
-                "|VALOR DE DESCONTO: R$ " + movimentacao.getValorDesconto() +"\n"+
-                "|VALOR TOTAL: R$ " + movimentacao.getValorTotal()+ "\n"+
-                "-----------------------------------\n"+
+                "|TEMPO DE MULTA GERADO EM MINUTOS: " + movimentacao.getTempoMulta() + "\n" +
+                "|VALOR DA MULTA: R$ " + movimentacao.getValorMulta() + "\n" +
+                "|VALOR DE DESCONTO GERADO: R$ " + movimentacao.getValorDesconto() + "\n" +
+                "|VALOR TOTAL: R$ " + movimentacao.getValorTotal() + "\n" +
+                "-----------------------------------\n" +
                 "==========VOLTE SEMPRE=============";
 
 

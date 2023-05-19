@@ -26,6 +26,7 @@ public class MarcaController {
     @GetMapping //outra forma de buscar por id
     public ResponseEntity<?> findByIdRequest(@RequestParam("id")final Long id ){
         try{
+
             return ResponseEntity.ok(service.buscaPorId(id));
         }
         catch (RuntimeException e){

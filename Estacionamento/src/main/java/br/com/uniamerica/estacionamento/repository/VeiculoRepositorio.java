@@ -20,7 +20,7 @@ public interface VeiculoRepositorio extends JpaRepository <Veiculo, Long> {
     public List<Marca> listar();
 
     @Query("select veiculo from Veiculo veiculo where veiculo.ativo = true")
-    public List<Marca> listarAtivos();
+    public List<Veiculo> listarAtivos();
     @Query("select count(*)>0 from Veiculo veiculo where veiculo.placa = :placa")
     public boolean checaPlaca(@RequestParam("placa") String placa);
 
@@ -30,5 +30,7 @@ public interface VeiculoRepositorio extends JpaRepository <Veiculo, Long> {
     @Query("select veiculo.id from Veiculo veiculo where veiculo.placa = :placa")
     public Long checaUsoRetornaId(@RequestParam("placa") String placa);
 
+    @Query("select count(*)>0 from Modelo modelo where modelo.id = :id and modelo.ativo=true ")
+    public boolean checaAtivoModelo(@RequestParam("id") Long id);
 }
 

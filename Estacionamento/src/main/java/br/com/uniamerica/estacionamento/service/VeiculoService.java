@@ -21,49 +21,58 @@ public class VeiculoService {
     @Autowired
     private ModeloRepositorio modeloRepositorio;
 
-    public Optional<Veiculo> BuscarPorID(final Long id){
-        if(id == null){
+    @Transactional(rollbackFor = Exception.class)
+    public Veiculo BuscarPorID(final Long id) {
+        Veiculo veiculo = this.repository.findById(id).orElse(null);
+        if (id == null) {
             throw new RuntimeException("Você não informou um id para consultar.");
-        }
-        else if (repository.checaId(id)){
+        } else if (repository.checaId(id)) {
             throw new RuntimeException("ID não localizado.");
         }
-        else{
-            Optional<Veiculo> veiculo = this.repository.findById(id);
-            return veiculo;}
+        return veiculo;
     }
 
-    @Transactional(rollbackFor =  Exception.class)
-    public void cadastrar(final Veiculo veiculo){
-        if(veiculo.getPlaca() == null){
+    @Transactional(rollbackFor = Exception.class)
+    public void cadastrar(final Veiculo veiculo) {
+        if (veiculo.getPlaca() == null) {
             throw new RuntimeException("Placa não informado");
-        } else if (veiculo.getCor() == null){
+        } else if (veiculo.getPlaca().matches("^[a-z|A-Z]{3}-[0-9]{1}[a-z|A-Z]{3}$|^[a-z|A-Z]{4}-[a-z|A-Z]{3}$|^[a-z|A-Z]{2}-[0-9]{3}[a-z|A-Z]{2}$|^[a-z|A-Z]{3}-[0-9]{4}$|^[a-z|A-Z]{3}-[0-9]{3}$")) {
+            throw new RuntimeException("Placa informada inválida. A placa deve seguir o padrão do Detran");
+        } else if (veiculo.getCor() == null) {
             throw new RuntimeException("cor não informado");
-        }
-        else if (veiculo.getTipo() == null){
+        } else if (veiculo.getTipo() == null) {
             throw new RuntimeException("tipo não informado");
-        }else if (veiculo.getAno() <1900 ){
+        } else if (veiculo.getAno() < 1900 || veiculo.getAno() > 2024) {
             throw new RuntimeException("Ano não informado");
-        }else if (this.repository.checaPlaca(veiculo.getPlaca())) {
-            throw new RuntimeException("placa já está cadastrado.");
+        } else if (this.repository.checaPlaca(veiculo.getPlaca())) {
+            throw new RuntimeException("placa já está cadastrada.");
+        } else if (veiculo.getTipo() == null) {
+            throw new RuntimeException("Tipo do veiculo não informado");
         } else if (!this.modeloRepositorio.existsById(veiculo.getModelo().getId())) {
             throw new RuntimeException("Modelo não cadastrado na base de dados.");
-        } else
-            repository.save(veiculo);
+        } else if (!repository.checaAtivoModelo(veiculo.getModelo().getId())) {
+            throw new RuntimeException("O modelo está desativado");
+        }
+        repository.save(veiculo);
     }
 
-    public void Atualizar(final Long id, final Veiculo veiculo){
+    @Transactional(rollbackFor = Exception.class)
+    public void Atualizar(final Long id, final Veiculo veiculo) {
 
-        if(veiculo.getPlaca() == null){
+        if (veiculo.getPlaca() == null) {
             throw new RuntimeException("placa não informado");
+        } else if (veiculo.getPlaca().matches("^[a-z|A-Z]{3}-[0-9]{1}[a-z|A-Z]{3}$|^[a-z|A-Z]{4}-[a-z|A-Z]{3}$|^[a-z|A-Z]{2}-[0-9]{3}[a-z|A-Z]{2}$|^[a-z|A-Z]{3}-[0-9]{4}$|^[a-z|A-Z]{3}-[0-9]{3}$")) {
+            throw new RuntimeException("Placa informada inválida. A placa deve seguir o padrão do Detran");
         } else if (id != veiculo.getId()) {
             throw new RuntimeException("Existe um erro com o ID informado");
-        } else if (veiculo.getCor() == null){
+        } else if (veiculo.getCor() == null) {
             throw new RuntimeException("cor não informado");
-        }  else if (veiculo.getTipo() == null){
+        } else if (veiculo.getTipo() == null) {
             throw new RuntimeException("tipo não informado");
-        } else if (veiculo.getAno() <1900 ){
+        } else if (veiculo.getAno() < 1900 || veiculo.getAno() > 2024) {
             throw new RuntimeException("Ano não informado ou inválido");
+        } else if (!repository.checaAtivoModelo(veiculo.getModelo().getId())) {
+            throw new RuntimeException("O modelo está desativado");
         } else if (repository.checaPlaca(veiculo.getPlaca())) {
             if (veiculo.getId() != repository.checaUsoRetornaId(veiculo.getPlaca())) {
                 throw new RuntimeException("Placa já está cadastrada em outro veiculo.");
@@ -72,6 +81,7 @@ public class VeiculoService {
         repository.save(veiculo);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void deletar(final Long id) {
         Veiculo veiculo = this.repository.findById(id).orElse(null);
         if (id == null) {
@@ -81,8 +91,8 @@ public class VeiculoService {
         } else if (repository.checaUso(id)) {
             veiculo.setAtivo(false);
             repository.save(veiculo);
-            } else {
-                repository.delete(veiculo);
-            }
+        } else {
+            repository.delete(veiculo);
         }
     }
+}

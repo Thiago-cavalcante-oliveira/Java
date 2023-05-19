@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 @Entity
 @Table(name = "tb_condutores", schema = "public")
-@Audited
-@AuditTable(value = "condutores_audit", schema = "audit")
+//@Audited
+//@AuditTable(value = "condutores_audit", schema = "audit")
 public class Condutor extends Entitty {
     @Getter
     @Setter
@@ -30,8 +30,12 @@ public class Condutor extends Entitty {
     @Getter
     @Setter
     @Column(name = "tempo_pago_minuto", nullable = false)
-
     private Long tempoPagoEmMinuto;
+
+    @Getter
+    @Setter
+    @Column(name = "tempo_pago_hora", nullable = false)
+    private Long tempoPagoEmHora;
     @Getter
     @Setter
     @Column(name = "tempo_desconto", nullable = false)

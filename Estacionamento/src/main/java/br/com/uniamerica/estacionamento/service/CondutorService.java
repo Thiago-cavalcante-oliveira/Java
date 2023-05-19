@@ -20,74 +20,74 @@ public class CondutorService {
     @Autowired
     private MovimentacaoRepositorio movimentacaoRepositorio;
 
-    @Transactional(rollbackFor =  Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void cadastrar(final Condutor condutor) {
-        if (condutor.getNome() == null ||  condutor.getNome().isEmpty()) {
+        if (condutor.getNome() == null || condutor.getNome().isEmpty() || condutor.getNome().isBlank()) {
             throw new RuntimeException("Nome não informado");
-        } else if ( condutor.getCpf() == null || condutor.getCpf().isEmpty()) {
+        } else if (condutor.getNome().length() > 150) {
+            throw new RuntimeException("Vc ultrapassou o limite de 150 caracteres");
+        } else if (condutor.getCpf() == null || condutor.getCpf().isEmpty() || condutor.getCpf().isBlank()) {
             throw new RuntimeException("cpf não informado");
-        } else if ( !isCPF(condutor.getCpf())){
+        } else if (!isCPF(condutor.getCpf())) {
             throw new RuntimeException("CPF inválido.");
-        } else if (condutor.getTelefone() == null || condutor.getTelefone().isEmpty()) {
+        } else if (condutor.getTelefone() == null || condutor.getTelefone().isEmpty() || condutor.getTelefone().isBlank()) {
             throw new RuntimeException("telefone não informado");
-        } else if (!condutor.getTelefone().matches( "^\\([0-9]{2}\\)[0-9]{5}-[0-9]{4}$|^\\([0-9]{2}\\)[0-9]{4}-[0-9]{4}$")) {
-            throw new RuntimeException("Telefone inválido");
+        } else if (!condutor.getTelefone().matches("^\\([0-9]{2}\\)[0-9]{5}-[0-9]{4}$|^\\([0-9]{2}\\)[0-9]{4}-[0-9]{4}$")) {
+            throw new RuntimeException("Telefone inválido. O formato dever ser (00)000-00 ou (11)11111-1111");
         } else if (repository.cpfEmUso(condutor.getCpf())) {
             throw new RuntimeException("cpf já está cadastrado.");
-        }
-        else if (repository.TelefoneEmUso(condutor.getTelefone())) {
-            throw new RuntimeException("TElefone já está cadastrado.");
-        }
-        else
+        } else if (repository.TelefoneEmUso(condutor.getTelefone())) {
+            throw new RuntimeException("Telefone já está cadastrado em outro condutor.");
+        } else
             repository.save(condutor);
     }
 
-    public void Atualizar(final Long id, final Condutor condutor){
+    public void Atualizar(final Long id, final Condutor condutor) {
 
-        if(!id.equals(condutor.getId())){
+        if (!id.equals(condutor.getId())) {
             throw new RuntimeException("Erro no Id do condutor");
-        } else if(condutor.getNome() == null || condutor.getNome().isEmpty()){
+        } else if (condutor.getNome() == null || condutor.getNome().isEmpty()) {
             throw new RuntimeException("Nome não informado");
-        } else if (condutor.getCpf() == null || condutor.getCpf().isEmpty()){
+        } else if (condutor.getCpf() == null || condutor.getCpf().isEmpty()) {
             throw new RuntimeException("cpf não informado");
         } else if (!isCPF(condutor.getCpf())) {
             throw new RuntimeException("CPF Iválido.");
-        } else if (condutor.getTelefone() == null || condutor.getTelefone().isEmpty()){
+        } else if (condutor.getTelefone() == null || condutor.getTelefone().isEmpty()) {
             throw new RuntimeException("telefone não informado");
         } else if (repository.cpfEmUso(condutor.getCpf())) {
-            if (condutor.getId() != id) {
-                throw new RuntimeException("cpf já está cadastrado.");
+            if (id != this.repository.checaCpfRetornaIdCondutor(condutor.getId())) {
+                throw new RuntimeException("cpf já está cadastrado em outro condutor.");
             }
         } else if (repository.TelefoneEmUso(condutor.getTelefone())) {
-            throw new RuntimeException("telefone já está cadastrado.");
+            if (!id.equals(this.repository.checaTelefoneRetornaIdCondutor(condutor.getTelefone()))) {
+                throw new RuntimeException("telefone já está cadastrado em outro condutor.");
+            }
         } else if (!condutor.isAtivo()) {
             throw new RuntimeException("Não pode ser Inativo ao Atualizar.");
         }
-            this.repository.save(condutor);
+        this.repository.save(condutor);
     }
 
     public void deletar(final Long id) {
         Condutor condutor = this.repository.getById(id);
-        if(movimentacaoRepositorio.existsById(condutor.getId())){
+        if (movimentacaoRepositorio.existsById(condutor.getId())) {
 
-                condutor.setAtivo(false);
-                this.repository.save(condutor);
-            } else {
-                this.repository.delete(condutor);
-            }
+            condutor.setAtivo(false);
+            this.repository.save(condutor);
+        } else {
+            this.repository.delete(condutor);
         }
-
-    public Optional<Condutor> buscaPorId(final Long id) {
-        if (id == null) {
-            throw new RuntimeException("Id não informado.");
-        } else if (!repository.checaId(id)) {
-            throw new RuntimeException("Id não existe na base de dados");
-        }
-        Optional<Condutor> condutor = this.repository.findById(id);
-        return condutor;
     }
 
-
+    public Condutor buscaPorId(final Long id) {
+        Condutor condutor = this.repository.findById(id).orElse(null);
+        if (id == null) {
+            throw new RuntimeException("Id não informado.");
+        } else if (!this.repository.checaId(id)) {
+            throw new RuntimeException("Id não existe na base de dados");
+        }
+        return condutor;
+    }
 
 
     public static boolean isCPF(String CPF) {
@@ -99,7 +99,7 @@ public class CondutorService {
                 CPF.equals("66666666666") || CPF.equals("77777777777") ||
                 CPF.equals("88888888888") || CPF.equals("99999999999") ||
                 (CPF.length() != 11))
-            return(false);
+            return (false);
 
         char dig10, dig11;
         int sm, i, r, num, peso;
@@ -109,11 +109,11 @@ public class CondutorService {
             // Calculo do 1o. Digito Verificador
             sm = 0;
             peso = 10;
-            for (i=0; i<9; i++) {
+            for (i = 0; i < 9; i++) {
                 // converte o i-esimo caractere do CPF em um numero:
                 // por exemplo, transforma o caractere '0' no inteiro 0
                 // (48 eh a posicao de '0' na tabela ASCII)
-                num = (int)(CPF.charAt(i) - 48);
+                num = (int) (CPF.charAt(i) - 48);
                 sm = sm + (num * peso);
                 peso = peso - 1;
             }
@@ -121,13 +121,13 @@ public class CondutorService {
             r = 11 - (sm % 11);
             if ((r == 10) || (r == 11))
                 dig10 = '0';
-            else dig10 = (char)(r + 48); // converte no respectivo caractere numerico
+            else dig10 = (char) (r + 48); // converte no respectivo caractere numerico
 
             // Calculo do 2o. Digito Verificador
             sm = 0;
             peso = 11;
-            for(i=0; i<10; i++) {
-                num = (int)(CPF.charAt(i) - 48);
+            for (i = 0; i < 10; i++) {
+                num = (int) (CPF.charAt(i) - 48);
                 sm = sm + (num * peso);
                 peso = peso - 1;
             }
@@ -135,14 +135,14 @@ public class CondutorService {
             r = 11 - (sm % 11);
             if ((r == 10) || (r == 11))
                 dig11 = '0';
-            else dig11 = (char)(r + 48);
+            else dig11 = (char) (r + 48);
 
             // Verifica se os digitos calculados conferem com os digitos informados.
             if ((dig10 == CPF.charAt(9)) && (dig11 == CPF.charAt(10)))
-                return(true);
-            else return(false);
+                return (true);
+            else return (false);
         } catch (InputMismatchException erro) {
-            return(false);
+            return (false);
         }
     }
 }

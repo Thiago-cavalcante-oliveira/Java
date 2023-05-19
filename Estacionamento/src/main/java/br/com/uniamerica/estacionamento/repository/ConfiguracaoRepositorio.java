@@ -11,4 +11,11 @@ public interface ConfiguracaoRepositorio extends JpaRepository <Configuracao, Lo
 
     @Query("select movimentacao from Movimentacao movimentacao where movimentacao.id = :id")
     public boolean checauso(@RequestParam("id") Long id);
+
+    @Query("select count(*)>0 from Configuracao configuracao where configuracao.ativo = true")
+    public boolean checaConfiguracaoAtiva();
+
+
+    @Query("SELECT configuracao1.id FROM Configuracao configuracao1 WHERE configuracao1.id = (SELECT MAX(configuracao2.id) FROM Configuracao configuracao2)")
+    public Long buscaUltimaConfiguracaoCadastrada();
 }

@@ -25,22 +25,26 @@ public class MarcaService {
 
     @Transactional(rollbackFor = Exception.class)
     public void cadastrar(final Marca marca) {
-        if (marca.getNome() == null || marca.getNome().isEmpty()) {
+        if (marca.getNome() == null || marca.getNome().isBlank()) {
             throw new RuntimeException("Nome não informado");
+        } else if (marca.getNome().length()>50) {
+            throw new RuntimeException("O nome ultrapassou o límite de 50 carcacteres");
         } else if (repository.checaNome(marca.getNome())) {
-
             throw new RuntimeException("Nome já está cadastrado.");
         } else
             repository.save(marca);
     }
 
     public void Atualizar(final Marca marca, final Long id) {
+
         if (id != marca.getId()) {
             throw new RuntimeException("Houve um erro: o id informado é diferente do ID em Banco");
         } else if (!repository.existsById(id)) {
             throw new RuntimeException("ID não encontrado na base de dados");
-        } else if (marca.getNome() == null) {
+        } else if (marca.getNome() == null || marca.getNome().isBlank()) {
             throw new RuntimeException("Nome não informado.");
+        } else if (marca.getNome().length()>50) {
+            throw new RuntimeException("O nome ultrapassou o límite de 50 carcacteres");
         } else if (repository.checaNome(marca.getNome())) {
             throw new RuntimeException("Este marca já está cadastrado.");
         } else if (!marca.isAtivo()) {
@@ -49,13 +53,13 @@ public class MarcaService {
         repository.save(marca);
     }
 
-    public Optional<Marca> buscaPorId(final Long id) {
+    public Marca buscaPorId(final Long id) {
+        Marca marca = this.repository.findById(id).orElse(null);
         if (id == null) {
             throw new RuntimeException("Id não informado.");
         } else if (!repository.checaId(id)) {
             throw new RuntimeException("Id não existe na base de dados");
         }
-        Optional<Marca> marca = this.repository.findById(id);
         return marca;
     }
 
@@ -64,8 +68,9 @@ public class MarcaService {
         Marca marca = this.repository.findById(id).orElse(null);
         if(id == null ){
             throw new RuntimeException("Id não informado");
-        }
-         else if (repository.checaUso(id)){
+        } else if (!repository.checaId(id)) {
+            throw new RuntimeException("ID não cadastrado na base de dados.");
+        } else if (repository.checaUso(id)){
             marca.setAtivo(false);
             this.repository.save(marca);
             } else {
