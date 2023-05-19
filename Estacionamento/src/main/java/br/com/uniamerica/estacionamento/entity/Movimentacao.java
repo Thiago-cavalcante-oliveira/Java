@@ -31,15 +31,15 @@ public class Movimentacao extends Entitty {
     @Getter
     @Setter
     @Column(name = "ds-tempo-uso")
-    private LocalTime tempo;
+    private Long tempo;
     @Getter
     @Setter
     @Column(name = "ds-tempo-desconto")
-    private LocalTime tempoDesconto;
+    private Long tempoDesconto;
     @Getter
     @Setter
     @Column(name = "ds-tempo-multa")
-    private LocalTime tempoMulta;
+    private Long tempoMulta;
     @Getter
     @Setter
     @Column(name = "vl-desconto")

@@ -1,6 +1,6 @@
 package br.com.uniamerica.estacionamento.entity;
 
 public enum Cor {
-    Branco, Azul, Amarelo, Preto, Cinza, Roxo, Vinho, Laranja, Grafite, Marrom,Rosa, Verde
+    BRANCO, AZUL, AMARELO, PRETO, CINZA, ROXO, VINHO, LARANJA, GRAFITE, MARROM,ROSA, VERDE, VERMELHO
 
 }

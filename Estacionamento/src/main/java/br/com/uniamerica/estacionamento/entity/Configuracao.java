@@ -11,40 +11,43 @@ import org.hibernate.envers.Audited;
 import java.math.BigDecimal;
 import java.time.LocalTime;
 @Entity
-@Table(name = "configuracoes", schema = "public")
+@Table(name = "tb_configuracoes", schema = "public")
 @Audited
 @AuditTable(value="configuracoes_audit", schema = "audit")
 public class Configuracao extends Entitty{
     @Getter @Setter
-    @Column(name = "num-valor-hora", nullable = false)
+    @Column(name = "vl_hora", nullable = false)
     private BigDecimal valorHora;
     @Getter @Setter
-    @Column(name = "num-valor-minuto-multa", nullable = false)
-    private BigDecimal valorMinutoHora;
+    @Column(name = "vl_minuto_multa", nullable = false)
+    private BigDecimal valorMinutoMulta;
     @Getter @Setter
-    @Column(name = "ds-inicio-atendimento", nullable = false)
+    @Column(name = "inicio_atendimento", nullable = false)
     private LocalTime inicioExpediente;
     @Getter @Setter
-    @Column(name = "ds-fim-atendimento", nullable = false)
+    @Column(name = "fim_atendimento", nullable = false)
     private LocalTime fimExpediente;
     @Getter @Setter
-    @Column(name = "num-gera-desconto", nullable = false)
-    private LocalTime tempoParaDesconto;
+    @Column(name = "num_gera_desconto", nullable = false)
+    private Long tempoParaGerarDesconto;
     @Getter @Setter
-    @Column(name = "num-tempo-desconto", nullable = false)
-    private LocalTime tempoDeDesconto;
+    @Column(name = "num_tempo_desconto", nullable = false)
+    private Long tempoDeCreditoDesconto;
     @Getter @Setter
-    @Column(name = "tp-gerar-desconto", nullable = false)
+    @Column(name = "st_gerar_desconto", nullable = false)
     private boolean gerarDesconto;
     @Getter @Setter
-    @Column(name = "num-vaga-moto", nullable = false)
+    @Column(name = "num_vaga_moto", nullable = false)
     private int vagasMoto;
     @Getter @Setter
-    @Column(name = "num-vaga-carro", nullable = false)
+    @Column(name = "num_vaga_carro", nullable = false)
     private int vagasCarro;
     @Getter @Setter
-    @Column(name = "num-vaga-van", nullable = false)
+    @Column(name = "num_vaga_van", nullable = false)
     private int vagasVan;
+    @Getter @Setter
+    @Column(name ="nm_versao", nullable = false, unique = true)
+    static int versao = 1;
 
 
 
