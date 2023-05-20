@@ -7,6 +7,7 @@ import br.com.uniamerica.estacionamento.repository.CondutorRepositorio;
 import br.com.uniamerica.estacionamento.repository.ConfiguracaoRepositorio;
 import br.com.uniamerica.estacionamento.repository.MovimentacaoRepositorio;
 import br.com.uniamerica.estacionamento.repository.VeiculoRepositorio;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
@@ -73,7 +74,7 @@ public class MovimentacaoService {
 
     }
 
-    public void deletar(@RequestParam("id") Long id) {
+    public void deletar( Long id) {
         Movimentacao movimentacao = this.repository.findById(id).orElse(null);
 
         if (id == null) {
@@ -89,8 +90,12 @@ public class MovimentacaoService {
     }
 
     public void calculaTempoEstacionado(Long id, Movimentacao saida) {
+
+        Configuracao configuracao = this.configuracaoRepositorio.buscaUltimaConfiguracaoCadastrada();
+        if(configuracao==null){
+            throw new RuntimeException("sem configuracao.");
+        }
         Long calculaDesconto, calculaHoraEstacionado, tempoEstacionado, tempoPagoCondutor;
-        Configuracao configuracao = this.configuracaoRepositorio.getById(1L);
         Movimentacao movimentacao = this.repository.getById(id);
         movimentacao.setSaida(saida.getSaida());
         Condutor condutor = movimentacao.getCondutor();
@@ -99,8 +104,6 @@ public class MovimentacaoService {
             throw new RuntimeException("Vc precisa informar a data e hora da saída.");
         } else if (movimentacao.getSaida().isBefore(movimentacao.getEntrada())) {
             throw new RuntimeException("A saída não pode ser anterior a entrada.");
-        } else if (!configuracaoRepositorio.checaConfiguracaoAtiva() ) {
-            throw new RuntimeException("Nã há uma configuracao ativa, favor configurar o sistemas antes de concluir o estacionamento.");
         }
 
         Duration duracaoEstacionado = Duration.between(movimentacao.getEntrada(), movimentacao.getSaida());
