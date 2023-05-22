@@ -19,7 +19,7 @@ public interface MarcaRepositorio extends JpaRepository <Marca, Long> {
     @Query("select marca from Marca marca")
     public List<Marca> listaMarcas();
 
-    @Query("select count(*)>0 from Marca marca where marca.ativo = true")
+    @Query("select marca from Marca marca where marca.ativo = true")
     public List<Marca> listaMarcasAtivas();
     @Query("select count(*)>0 from Marca marca where marca.id = :id and marca.ativo = true ")
     public boolean marcaAtiva(@RequestParam("id")Long id);

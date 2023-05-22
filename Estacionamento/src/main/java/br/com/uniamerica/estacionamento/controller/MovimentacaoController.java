@@ -86,10 +86,16 @@ public class MovimentacaoController {
     @PatchMapping
     public ResponseEntity<?> finalizarEstacionamento(@RequestParam("id") Long id,
                                                      @RequestBody Movimentacao sair){
-        service.calculaTempoEstacionado(id, sair);
+        try {
+            service.calculaTempoEstacionado(id, sair);
 
-        return ResponseEntity.ok(service.calculaMulta(id, sair));
+            return ResponseEntity.ok(service.calculaMulta(id, sair));
+        }
+        catch (RuntimeException e){
+        return ResponseEntity.badRequest().body("Erro: "+ e.getMessage());
+        }
     }
+
 
 
     @DeleteMapping ("/{id}")

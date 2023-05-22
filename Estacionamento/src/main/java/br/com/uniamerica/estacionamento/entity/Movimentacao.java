@@ -64,7 +64,7 @@ public class Movimentacao extends Entitty {
     @Getter
     @Setter
     @JoinColumn(name = "co_configuracao")
-    @OneToOne
+    @ManyToOne
     private Configuracao configuracao;
 
 

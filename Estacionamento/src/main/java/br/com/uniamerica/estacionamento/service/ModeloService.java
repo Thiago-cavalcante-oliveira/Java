@@ -59,7 +59,7 @@ public class ModeloService {
         Modelo modelo = this.repository.findById(id).orElse(null);
         if (id == null) {
             throw new RuntimeException("Você não informou um id para consultar.");
-        } else if (repository.ChecaId(id)) {
+        } else if (!repository.ChecaId(id)) {
             throw new RuntimeException("ID não localizado.");
         }
         return modelo;
@@ -75,8 +75,9 @@ public class ModeloService {
         } else if (repository.checaUso(id)) {
             modelo.setAtivo(false);
             repository.save(modelo);
+        } else {
+            repository.delete(modelo);
         }
-        repository.delete(modelo);
     }
 }
 

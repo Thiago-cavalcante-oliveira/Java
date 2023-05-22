@@ -10,6 +10,7 @@ import br.com.uniamerica.estacionamento.repository.VeiculoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -75,7 +76,6 @@ public class MovimentacaoService {
 
     public void deletar(@RequestParam("id") Long id) {
         Movimentacao movimentacao = this.repository.findById(id).orElse(null);
-
         if (id == null) {
             throw new RuntimeException("ID não informado.");
         } else if (!repository.checaMovimentacao(id)) {
@@ -85,12 +85,15 @@ public class MovimentacaoService {
             this.repository.save(movimentacao);
         }
         repository.delete(movimentacao);
-
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void calculaTempoEstacionado(Long id, Movimentacao saida) {
+        if (!configuracaoRepositorio.checaConfiguracaoAtiva()) {
+            throw new RuntimeException("Não há uma Configuracao cadastrada.");
+        }
         Long calculaDesconto, calculaHoraEstacionado, tempoEstacionado, tempoPagoCondutor;
-        Configuracao configuracao = this.configuracaoRepositorio.getById(1L);
+        Configuracao configuracao = this.configuracaoRepositorio.buscaUltimaConfiguracaoCadastrada();
         Movimentacao movimentacao = this.repository.getById(id);
         movimentacao.setSaida(saida.getSaida());
         Condutor condutor = movimentacao.getCondutor();
@@ -99,7 +102,7 @@ public class MovimentacaoService {
             throw new RuntimeException("Vc precisa informar a data e hora da saída.");
         } else if (movimentacao.getSaida().isBefore(movimentacao.getEntrada())) {
             throw new RuntimeException("A saída não pode ser anterior a entrada.");
-        } else if (!configuracaoRepositorio.checaConfiguracaoAtiva() ) {
+        } else if (!configuracaoRepositorio.checaConfiguracaoAtiva()) {
             throw new RuntimeException("Nã há uma configuracao ativa, favor configurar o sistemas antes de concluir o estacionamento.");
         }
 
@@ -110,7 +113,6 @@ public class MovimentacaoService {
         tempoPagoCondutor += tempoEstacionado;
 
         BigDecimal valorEstacionado = new BigDecimal(tempoEstacionado);
-
         movimentacao.setValorHora(valorEstacionado.multiply(configuracao.getValorHora().divide(BigDecimal.valueOf(60))));
         calculaHoraEstacionado = tempoPagoCondutor / 60;
 
@@ -125,6 +127,7 @@ public class MovimentacaoService {
         repository.save(movimentacao);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public String calculaMulta(Long id, Movimentacao sair) {
         Long multaEntrada = 0L, multaSaida = 0L, somaTempo = 0L;
         Movimentacao movimentacao = this.repository.getById(id);
@@ -134,7 +137,9 @@ public class MovimentacaoService {
 
         LocalTime entrada = movimentacao.getEntrada().toLocalTime();
         LocalTime saida = movimentacao.getSaida().toLocalTime();
-        Configuracao configuracao = this.configuracaoRepositorio.getById(1L);
+        Configuracao configuracao = this.configuracaoRepositorio.buscaUltimaConfiguracaoCadastrada();
+        movimentacao.setConfiguracao(configuracao);
+        repository.save(movimentacao);
 
         int dias = 0, ano = 0;
 
@@ -174,6 +179,7 @@ public class MovimentacaoService {
 
         movimentacao.setTempoMulta(somaTempo);
         movimentacao.setValorHoraMulta(configuracao.getValorMinutoMulta().multiply(multiplicadorMulta));
+
         repository.save(movimentacao);
 
         return "----------------------------------\n" +

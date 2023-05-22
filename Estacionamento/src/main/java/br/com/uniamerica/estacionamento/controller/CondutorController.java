@@ -73,8 +73,8 @@ public class CondutorController {
 
 
 
-    @DeleteMapping ("/{id}")
-    public ResponseEntity <?> inativar(@PathVariable("id") Long id){
+    @DeleteMapping
+    public ResponseEntity <?> inativar(@RequestParam("id") Long id){
       try{
           this.service.deletar(id);
           return ResponseEntity.ok("Deletado com sucesso.");

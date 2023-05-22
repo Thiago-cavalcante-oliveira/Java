@@ -69,13 +69,20 @@ public class CondutorService {
     }
 
     public void deletar(final Long id) {
-        Condutor condutor = this.repository.getById(id);
-        if (movimentacaoRepositorio.existsById(condutor.getId())) {
 
+        Condutor condutor = this.repository.findById(id).orElse(null);
+
+        if (movimentacaoRepositorio.existsById(condutor.getId())) {
+            if (movimentacaoRepositorio.checaMoviemntacaoAbertaSemSaida(id)) {
+                throw new RuntimeException("Este condutor possui uma movimentacao em aberto, não pode ser excluido.");
+            }
+        }
+        else if (movimentacaoRepositorio.existsById(condutor.getId())) {
             condutor.setAtivo(false);
-            this.repository.save(condutor);
-        } else {
-            this.repository.delete(condutor);
+            repository.save(condutor);
+
+        }else{
+            repository.delete(condutor);
         }
     }
 

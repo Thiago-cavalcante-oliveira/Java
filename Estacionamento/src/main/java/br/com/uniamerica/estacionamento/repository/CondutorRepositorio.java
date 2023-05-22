@@ -1,6 +1,7 @@
 package br.com.uniamerica.estacionamento.repository;
 
 import br.com.uniamerica.estacionamento.entity.Condutor;
+import br.com.uniamerica.estacionamento.repository.MovimentacaoRepositorio;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -34,5 +35,7 @@ public interface CondutorRepositorio extends JpaRepository <Condutor, Long> {
 
     @Query("select condutor.id from Condutor condutor where condutor.telefone = :telefone")
     public Long checaTelefoneRetornaIdCondutor(@RequestParam("id")String telefone);
+    @Query("SELECT count(*)>0 from Movimentacao movimentacao where movimentacao.condutor.id = :id and movimentacao.entrada is not null and movimentacao.saida = null ")
+    public boolean checaCondutorMovimentacaoAberta(@RequestParam("id")Long id);
 
 }
