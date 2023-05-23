@@ -59,7 +59,7 @@ public class CondutorService {
                 throw new RuntimeException("cpf já está cadastrado em outro condutor.");
             }
         } else if (repository.TelefoneEmUso(condutor.getTelefone())) {
-            if (!id.equals(this.repository.checaTelefoneRetornaIdCondutor(condutor.getTelefone()))) {
+            if (id != this.repository.checaTelefoneRetornaIdCondutor(condutor.getTelefone())) {
                 throw new RuntimeException("telefone já está cadastrado em outro condutor.");
             }
         } else if (!condutor.isAtivo()) {
@@ -70,19 +70,20 @@ public class CondutorService {
 
     public void deletar(final Long id) {
 
-        Condutor condutor = this.repository.findById(id).orElse(null);
+        Condutor condutor = this.repository.getById(id);
 
         if (movimentacaoRepositorio.existsById(condutor.getId())) {
             if (movimentacaoRepositorio.checaMoviemntacaoAbertaSemSaida(id)) {
                 throw new RuntimeException("Este condutor possui uma movimentacao em aberto, não pode ser excluido.");
             }
         }
-        else if (movimentacaoRepositorio.existsById(condutor.getId())) {
+         if (repository.checaUso(condutor.getId())) {
             condutor.setAtivo(false);
-            repository.save(condutor);
+            this.repository.save(condutor);
 
-        }else{
-            repository.delete(condutor);
+        }
+        else{
+            this.repository.delete(condutor);
         }
     }
 
