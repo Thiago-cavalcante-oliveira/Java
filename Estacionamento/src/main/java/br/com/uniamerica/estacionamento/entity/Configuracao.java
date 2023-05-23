@@ -2,6 +2,7 @@ package br.com.uniamerica.estacionamento.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 @Entity
 @Table(name = "tb_configuracoes", schema = "public")
@@ -46,9 +48,7 @@ public class Configuracao extends Entitty{
     @Column(name = "num_vaga_van", nullable = false)
     private int vagasVan;
     @Getter @Setter
-    @Column(name ="nm_versao", nullable = false, unique = true)
-    static int versao = 1;
-
-
+    @Column(name ="nm_versao", nullable = false)
+    private int versao;
 
 }

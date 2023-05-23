@@ -5,6 +5,7 @@ import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.entity.Veiculo;
 import br.com.uniamerica.estacionamento.repository.MarcaRepositorio;
 import br.com.uniamerica.estacionamento.repository.ModeloRepositorio;
+import br.com.uniamerica.estacionamento.repository.MovimentacaoRepositorio;
 import br.com.uniamerica.estacionamento.repository.VeiculoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,13 +21,15 @@ public class VeiculoService {
     private MarcaRepositorio marcaRepositorio;
     @Autowired
     private ModeloRepositorio modeloRepositorio;
+    @Autowired
+    private MovimentacaoRepositorio movimentacaoRepositorio;
 
     @Transactional(rollbackFor = Exception.class)
     public Veiculo BuscarPorID(final Long id) {
         Veiculo veiculo = this.repository.findById(id).orElse(null);
         if (id == null) {
             throw new RuntimeException("Você não informou um id para consultar.");
-        } else if (repository.checaId(id)) {
+        } else if (!repository.checaId(id)) {
             throw new RuntimeException("ID não localizado.");
         }
         return veiculo;
@@ -84,15 +87,17 @@ public class VeiculoService {
     @Transactional(rollbackFor = Exception.class)
     public void deletar(final Long id) {
         Veiculo veiculo = this.repository.findById(id).orElse(null);
-        if (id == null) {
-            throw new RuntimeException("ID não informado.");
-        } else if (!repository.checaId(id)) {
+        if (veiculo == null) {
             throw new RuntimeException("ID não encontrado na base de dados.");
-        } else if (repository.checaUso(id)) {
-            veiculo.setAtivo(false);
-            repository.save(veiculo);
         } else {
-            repository.delete(veiculo);
+            if (repository.checaMoviemntacaoAbertaSemSaida(id)) {
+                throw new RuntimeException("Veiculo nao pode ser deletado, esta em uma movimentacao aberta");
+            } else if (movimentacaoRepositorio.existsById(veiculo.getId())) {
+                veiculo.setAtivo(false);
+                repository.save(veiculo);
+            } else {
+                repository.delete(veiculo);
+            }
         }
     }
 }

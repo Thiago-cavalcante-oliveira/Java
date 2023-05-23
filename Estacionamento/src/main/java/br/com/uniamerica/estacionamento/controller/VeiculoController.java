@@ -70,7 +70,7 @@ public class VeiculoController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> atualizaVeiculo(@RequestParam final Long id) {
+    public ResponseEntity<?> deletaVeiculo(@RequestParam final Long id) {
         try {
             this.service.deletar(id);
             return ResponseEntity.ok("Veiculo Deletado.");

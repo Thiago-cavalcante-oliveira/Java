@@ -34,11 +34,13 @@ public class ConfiguracaoService {
         } else if (configuracao.getVagasMoto() < 0) {
             throw new RuntimeException("Informar vagas de moto.");
         } else {
-            repository.save(configuracao);
+            configuracao.setVersao(configuracao.getVersao() + 1);
+            this.repository.save(configuracao);
         }
     }
 
     public void atualizar(final Long id, final Configuracao configuracao) {
+
         if (id != configuracao.getId()) {
             throw new RuntimeException("Erro no ID");
         } else if (configuracao.getInicioExpediente() == null) {
@@ -60,15 +62,29 @@ public class ConfiguracaoService {
         } else if (configuracao.getVagasMoto() < 0) {
             throw new RuntimeException("Informar vagas de moto.");
         } else {
-            repository.save(configuracao);
+
+            int versao = this.repository.getById(id).getVersao();
+            versao += 1;
+            configuracao.setVersao(versao);
+            this.repository.save(configuracao);
         }
     }
 
-    public void deletar(Long id){
+    public String deletar(Long id) {
         Configuracao configuracao = this.repository.findById(id).orElse(null);
-         if(id == null){
-             throw new RuntimeException("ID da configuracao nao informado");
-         }
+        if (id == null) {
+            throw new RuntimeException("ID da configuracao nao informado");
+        } else if (!this.repository.existsById(id)) {
+            throw new RuntimeException("ID da configuracao não localizado no base de dados");
+        } else if (this.repository.checaConfiguracaoMovimentacaoAberta(configuracao.getId())) {
+            throw new RuntimeException("Configuracao não pode ser excluida pois está ligado a uma movimentação ativa no momento.");
+        } else if (this.repository.existsById(id) && this.repository.checauso(id)) {
+            configuracao.setAtivo(false);
+            this.repository.save(configuracao);
+            return "Configuracao inativada, pois está vinculada a uma movimentacao.";
+        }
+        this.repository.delete(configuracao);
+        return "Configuracao deletada.";
     }
 
 
