@@ -76,8 +76,8 @@ public class CondutorController {
     @DeleteMapping ("/{id}")
     public ResponseEntity <?> inativar(@PathVariable("id") Long id){
       try{
-          this.service.deletar(id);
-          return ResponseEntity.ok("Deletado com sucesso.");
+
+          return ResponseEntity.ok( this.service.deletar(id));
       }
       catch (RuntimeException e){
           return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
