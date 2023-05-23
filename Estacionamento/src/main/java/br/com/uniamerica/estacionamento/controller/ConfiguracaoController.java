@@ -9,14 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.processing.Generated;
+
 @Controller
 @RequestMapping(value = "/api/configuracao")
 public class ConfiguracaoController {
 @Autowired
     private ConfiguracaoRepositorio configuracaoRepositorio;
-    //public ConfiguracaoController(ConfiguracaoController configuracaoController){
-      //  this.configuracaoRepositorio = configuracaoRepositorio;
-    //}
+
     @Autowired
     private ConfiguracaoService service;
 
@@ -25,6 +25,16 @@ public class ConfiguracaoController {
         final Configuracao configuracao = this.configuracaoRepositorio.findById(id).orElse(null);
         return configuracao == null ? ResponseEntity.badRequest().body("Não localizado") :
                 ResponseEntity.ok(configuracao);
+    }
+
+    @GetMapping("/lista")
+    public ResponseEntity<?> buscaLista(){
+        return ResponseEntity.ok(this.configuracaoRepositorio.findAll());
+    }
+
+    @GetMapping("listaativa")
+    public ResponseEntity<?> buscaListaAtiva(){
+        return ResponseEntity.ok(this.configuracaoRepositorio.checaListaAtivaConfiguracao());
     }
 
     @PostMapping
@@ -39,13 +49,25 @@ public class ConfiguracaoController {
        }
 
     @PutMapping
-    public  ResponseEntity <?> editaConfiguracao(@RequestParam final Long id, @RequestBody Configuracao configuracao){
+    public  ResponseEntity <?> editaConfiguracao(@RequestParam("id") final Long id, @RequestBody Configuracao configuracao){
        try{
            this.service.atualizar(id, configuracao);
            return ResponseEntity.ok("Configuracao Atualizada com sucesso.");
        }  catch (RuntimeException e) {
            return ResponseEntity.badRequest().body("Error " + e.getMessage());
        }
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deletaConfiguracao(@RequestParam("id") final Long id){
+
+        try{
+        return  ResponseEntity.ok(service.deletar(id));
+
+        }
+        catch (RuntimeException e){
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
     }
 
 }

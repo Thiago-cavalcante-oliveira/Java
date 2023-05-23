@@ -31,12 +31,12 @@ public interface CondutorRepositorio extends JpaRepository <Condutor, Long> {
     @Query ("select count(*)>0 from Movimentacao movimentacao where movimentacao.condutor.id = :id")
     public boolean checaUso(@Param("id") Long id);
 
-    @Query("select condutor.id from Condutor condutor where condutor.id = :id")
-    public Long checaCpfRetornaIdCondutor(@Param("id")Long id);
+    @Query("select condutor.id from Condutor condutor where condutor.cpf = :cpf")
+    public Long checaCpfRetornaIdCondutor(@Param("cpf")String cpf);
 
     @Query("select condutor.id from Condutor condutor where condutor.telefone = :telefone")
     public Long checaTelefoneRetornaIdCondutor(@Param("telefone")String telefone);
-    @Query("SELECT count(*)>0 from Movimentacao movimentacao where movimentacao.condutor.id = :id and movimentacao.entrada is not null and movimentacao.saida = null ")
+    @Query("SELECT count(*)>0 from Movimentacao movimentacao where movimentacao.condutor.id = :id and movimentacao.entrada is not null and movimentacao.saida is null ")
     public boolean checaCondutorMovimentacaoAberta(@Param("id")Long id);
 
 }

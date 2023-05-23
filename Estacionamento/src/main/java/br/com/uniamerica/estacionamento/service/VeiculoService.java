@@ -87,15 +87,17 @@ public class VeiculoService {
     @Transactional(rollbackFor = Exception.class)
     public void deletar(final Long id) {
         Veiculo veiculo = this.repository.findById(id).orElse(null);
-        if (id == null) {
-            throw new RuntimeException("ID não informado.");
-        } else if (!repository.existsById(veiculo.getId())) {
+        if (veiculo == null) {
             throw new RuntimeException("ID não encontrado na base de dados.");
-        } else if (movimentacaoRepositorio.existsById(veiculo.getId())) {
-            veiculo.setAtivo(false);
-            repository.save(veiculo);
         } else {
-            repository.delete(veiculo);
+            if (repository.checaMoviemntacaoAbertaSemSaida(id)) {
+                throw new RuntimeException("Veiculo nao pode ser deletado, esta em uma movimentacao aberta");
+            } else if (movimentacaoRepositorio.existsById(veiculo.getId())) {
+                veiculo.setAtivo(false);
+                repository.save(veiculo);
+            } else {
+                repository.delete(veiculo);
+            }
         }
     }
 }

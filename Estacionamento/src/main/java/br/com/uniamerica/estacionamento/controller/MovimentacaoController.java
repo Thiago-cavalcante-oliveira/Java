@@ -21,29 +21,33 @@ import java.util.List;
 @RequestMapping(value = "/api/movimentacao")
 
 public class MovimentacaoController {
-@Autowired
+    @Autowired
     private MovimentacaoRepositorio movimentacaoRepositorio;
     //public MovimentacaoController (MovimentacaoRepositorio movimentacaoRepositorio){
     //    this.movimentacaoRepositorio = movimentacaoRepositorio;
     //}
     @Autowired
     private MovimentacaoService service;
-    @GetMapping("/{id}")
-    public ResponseEntity<?> buscaMovimentacao(@RequestParam("id") final Long id){
+
+    @GetMapping
+    public ResponseEntity<?> buscaMovimentacao(@RequestParam("id") final Long id) {
         final Movimentacao movimentacao = this.movimentacaoRepositorio.findById(id).orElse(null);
-        return movimentacao == null ?
-                ResponseEntity.badRequest().body("Valor não encontrado") :
-                ResponseEntity.ok(movimentacao);
+        try {
+            return ResponseEntity.ok(movimentacao);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro ao localizar o ID.");
+        }
     }
+
     @GetMapping("/lista")
-    public ResponseEntity <?> buscaLista(){
+    public ResponseEntity<?> buscaLista() {
         return ResponseEntity.ok(this.movimentacaoRepositorio.findAll());
     }
 
     @GetMapping("/listaAtiva")
-    public ResponseEntity<?> listaAtivo(){
+    public ResponseEntity<?> listaAtivo() {
 
-        return ResponseEntity.ok(movimentacaoRepositorio.listarAtivo()) ;
+        return ResponseEntity.ok(movimentacaoRepositorio.listarAtivo());
     }
 
     @GetMapping("/listaAtivaSemSaida")
@@ -54,18 +58,17 @@ public class MovimentacaoController {
 
 
     @PostMapping
-        public ResponseEntity<?> cadastraMovimentacao (@RequestBody final Movimentacao movimentacao){
-      try {
-          this.service.cadastrar(movimentacao);
-          return ResponseEntity.ok("Carro estacionado");
-      }
-      catch (RuntimeException e){
-          return ResponseEntity.badRequest().body("erro: " + e.getMessage());
-      }
+    public ResponseEntity<?> cadastraMovimentacao(@RequestBody final Movimentacao movimentacao) {
+        try {
+            this.service.cadastrar(movimentacao);
+            return ResponseEntity.ok("Carro estacionado");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("erro: " + e.getMessage());
+        }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> atualizaMovimentacao(@PathVariable("id") final Long id, @RequestBody final Movimentacao movimentacao) {
+    @PutMapping
+    public ResponseEntity<?> atualizaMovimentacao(@RequestParam("id") final Long id, @RequestBody final Movimentacao movimentacao) {
         try {
 
             this.service.atualizar(movimentacao);
@@ -75,56 +78,26 @@ public class MovimentacaoController {
         }
     }
 
-
-    @PutMapping
-    public ResponseEntity<?> finalizaEstacionamento(@RequestParam("id") Long id, @RequestBody LocalDateTime finalizar){
-
-    return ResponseEntity.ok("Finalizado estacionamento.");
-
-    }
-
     @PatchMapping
     public ResponseEntity<?> finalizarEstacionamento(@RequestParam("id") Long id,
-                                                     @RequestBody Movimentacao sair){
+                                                     @RequestBody Movimentacao sair) {
         try {
             service.calculaTempoEstacionado(id, sair);
-
             return ResponseEntity.ok(service.calculaMulta(id, sair));
-        }
-        catch (RuntimeException e){
-        return ResponseEntity.badRequest().body("Erro: "+ e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
 
-
-
-    @DeleteMapping ("/{id}")
-    public ResponseEntity <?> inativar(@PathVariable("id") Long id){
+    @DeleteMapping
+    public ResponseEntity<?> inativar(@RequestParam("id") Long id) {
         try {
-            final Movimentacao valorBanco = this.movimentacaoRepositorio.findById(id).orElse(null);
-            if (valorBanco == null ){
-                throw new RuntimeException("Não foi possível identificar o registro");
-            }
-            valorBanco.setAtivo(false);
-            this.movimentacaoRepositorio.delete(valorBanco);
-            return ResponseEntity.ok("Registro Deletado");
+            this.service.deletarMovimentacao(id);
+            return ResponseEntity.ok(this.service.deletarMovimentacao(id));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.internalServerError().body("Error" + e + e.getCause().getCause().getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
-        catch (DataIntegrityViolationException e){
-            return  ResponseEntity.internalServerError().body("Error"+e + e.getCause().getCause().getMessage());
-        }
-        catch (Exception e){
-            final Movimentacao valorBanco = this.movimentacaoRepositorio.findById(id).orElse(null);
-            if (valorBanco == null ){
-                throw new RuntimeException("Não foi possível identificar o registro");
-            }
-            valorBanco.setAtivo(false);
-            this.movimentacaoRepositorio.save(valorBanco);
-            return ResponseEntity.ok("Registro Inativado");
-        }
-
-
     }
-
-
-
 }

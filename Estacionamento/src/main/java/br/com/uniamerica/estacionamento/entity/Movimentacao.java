@@ -67,6 +67,11 @@ public class Movimentacao extends Entitty {
     @ManyToOne
     private Configuracao configuracao;
 
+    @Getter
+    @Setter
+    @JoinColumn(name = "versao_configuracao")
+    private int versao;
+
 
 
 }

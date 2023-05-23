@@ -55,7 +55,7 @@ public class CondutorService {
         } else if (condutor.getTelefone() == null || condutor.getTelefone().isEmpty()) {
             throw new RuntimeException("telefone não informado");
         } else if (repository.cpfEmUso(condutor.getCpf())) {
-            if (id != this.repository.checaCpfRetornaIdCondutor(condutor.getId())) {
+            if (id != this.repository.checaCpfRetornaIdCondutor(condutor.getCpf())) {
                 throw new RuntimeException("cpf já está cadastrado em outro condutor.");
             }
         } else if (repository.TelefoneEmUso(condutor.getTelefone())) {
@@ -73,17 +73,17 @@ public class CondutorService {
         Condutor condutor = this.repository.getById(id);
 
         if (movimentacaoRepositorio.existsById(condutor.getId())) {
-            if (movimentacaoRepositorio.checaMoviemntacaoAbertaSemSaida(id)) {
+            if (movimentacaoRepositorio.checaMoviemntacaoAbertaSemSaida(condutor.getId())) {
                 throw new RuntimeException("Este condutor possui uma movimentacao em aberto, não pode ser excluido.");
-            }
-        }
-         if (repository.checaUso(condutor.getId())) {
-            condutor.setAtivo(false);
-            this.repository.save(condutor);
+            } else if (repository.checaUso(condutor.getId())) {
+                condutor.setAtivo(false);
+                this.repository.save(condutor);
 
-        }
-        else{
-            this.repository.delete(condutor);
+            } else {
+                this.repository.delete(condutor);
+            }
+        } else {
+            throw new RuntimeException("ID não encontrado na base de dados.");
         }
     }
 

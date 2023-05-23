@@ -43,8 +43,7 @@ public class MovimentacaoService {
             throw new RuntimeException("Veiculo não encontrado no banco de dados.");
         } else if (movimentacao.getEntrada() == null) {
             throw new RuntimeException("Entrada nao informado.");
-        } else if (repository.existsById(movimentacao.getVeiculo().getId())
-                && movimentacao.getSaida() == null) {
+        } else if (this.repository.checaCarroEstacionado(movimentacao.getVeiculo().getId())) {
             throw new RuntimeException("Veiculo já está estacionado.");
         }
         repository.save(movimentacao);
@@ -80,7 +79,7 @@ public class MovimentacaoService {
             throw new RuntimeException("ID não informado.");
         } else if (!repository.checaMovimentacao(id)) {
             throw new RuntimeException("Id da movimentacao não localizado");
-        } else if (repository.checaMovimentacao(id)) {
+        } else if (!repository.checaMoviemntacaoAbertaSemSaida(id)) {
             movimentacao.setAtivo(false);
             this.repository.save(movimentacao);
         }
@@ -139,6 +138,7 @@ public class MovimentacaoService {
         LocalTime saida = movimentacao.getSaida().toLocalTime();
         Configuracao configuracao = this.configuracaoRepositorio.buscaUltimaConfiguracaoCadastrada();
         movimentacao.setConfiguracao(configuracao);
+        movimentacao.setVersao(configuracao.getVersao());
         repository.save(movimentacao);
 
         int dias = 0, ano = 0;
@@ -204,5 +204,24 @@ public class MovimentacaoService {
                 "==========VOLTE SEMPRE=============";
 
 
+    }
+
+    @Transactional
+    public String deletarMovimentacao(Long id) {
+        Movimentacao movimentacao = this.repository.findById(id).orElse(null);
+        if (movimentacao == null) {
+            throw new RuntimeException("ID da Movimentacao não localizado no base de dados");
+        } else {
+            if (this.repository.checaMovimentacaoFinalizada(id)) {
+                movimentacao.setAtivo(false);
+                this.repository.save(movimentacao);
+                return "movimentacao inativada, pois esta movimentacao está concluida.";
+
+            } else {
+
+                this.repository.delete(movimentacao);
+                return "movimentacao deletada.";
+            }
+        }
     }
 }
