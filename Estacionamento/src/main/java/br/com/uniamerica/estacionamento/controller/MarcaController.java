@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/marca")
 
@@ -55,8 +55,8 @@ public class MarcaController {
         }
        }
 
-    @PutMapping
-        public ResponseEntity<?> atualizaMarca(@RequestParam("id") final Long id,
+    @PutMapping("/{id}")
+        public ResponseEntity<?> atualizaMarca(@PathVariable("id") final Long id,
                                                @RequestBody final Marca marca)
     {
         try {
@@ -69,8 +69,8 @@ public class MarcaController {
 
     }
 
-    @DeleteMapping
-    public ResponseEntity <?> inativar(@RequestParam("id") final Long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity <?> inativar(@PathVariable("id") final Long id){
         try {
             this.service.deletar(id);
             return  ResponseEntity.ok("Marca deletada.");

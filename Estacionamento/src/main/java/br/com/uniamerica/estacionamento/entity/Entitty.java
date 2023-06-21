@@ -1,5 +1,6 @@
 package br.com.uniamerica.estacionamento.entity;
 import jakarta.persistence.*;
+import  jakarta.persistence.PrePersist;
 import lombok.Getter;
 import lombok.Setter;
 

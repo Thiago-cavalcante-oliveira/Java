@@ -32,7 +32,7 @@ public class CondutorService {
             throw new RuntimeException("CPF inválido.");
         } else if (condutor.getTelefone() == null || condutor.getTelefone().isEmpty() || condutor.getTelefone().isBlank()) {
             throw new RuntimeException("telefone não informado");
-        } else if (!condutor.getTelefone().matches("^\\([0-9]{2}\\)[0-9]{5}-[0-9]{4}$|^\\([0-9]{2}\\)[0-9]{4}-[0-9]{4}$")) {
+        } else if (!condutor.getTelefone().matches("^\\([0-9]{2}\\) [0-9]{5}-[0-9]{4}$|^\\([0-9]{2}\\) [0-9]{4}-[0-9]{4}$")) {
             throw new RuntimeException("Telefone inválido. O formato dever ser (00)000-00 ou (11)11111-1111");
         } else if (repository.cpfEmUso(condutor.getCpf())) {
             throw new RuntimeException("cpf já está cadastrado.");
@@ -43,6 +43,7 @@ public class CondutorService {
     }
 
     public void Atualizar(final Long id, final Condutor condutor) {
+
 
         if (!id.equals(condutor.getId())) {
             throw new RuntimeException("Erro no Id do condutor");
@@ -99,14 +100,20 @@ public class CondutorService {
 
 
     public static boolean isCPF(String CPF) {
+
+
+         String cpfRegex = CPF.replaceAll("[^0-9]", "");
+         System.out.println(cpfRegex);
+
+
         // considera-se erro CPF's formados por uma sequencia de numeros iguais
-        if (CPF.equals("00000000000") ||
-                CPF.equals("11111111111") ||
-                CPF.equals("22222222222") || CPF.equals("33333333333") ||
-                CPF.equals("44444444444") || CPF.equals("55555555555") ||
-                CPF.equals("66666666666") || CPF.equals("77777777777") ||
-                CPF.equals("88888888888") || CPF.equals("99999999999") ||
-                (CPF.length() != 11))
+        if (cpfRegex.equals("00000000000") ||
+                cpfRegex.equals("11111111111") ||
+                cpfRegex.equals("22222222222") || cpfRegex.equals("33333333333") ||
+                cpfRegex.equals("44444444444") || cpfRegex.equals("55555555555") ||
+                cpfRegex.equals("66666666666") || cpfRegex.equals("77777777777") ||
+                cpfRegex.equals("88888888888") || cpfRegex.equals("99999999999") ||
+                (cpfRegex.length() != 11))
             return (false);
 
         char dig10, dig11;
@@ -121,7 +128,7 @@ public class CondutorService {
                 // converte o i-esimo caractere do CPF em um numero:
                 // por exemplo, transforma o caractere '0' no inteiro 0
                 // (48 eh a posicao de '0' na tabela ASCII)
-                num = (int) (CPF.charAt(i) - 48);
+                num = (int) (cpfRegex.charAt(i) - 48);
                 sm = sm + (num * peso);
                 peso = peso - 1;
             }
@@ -135,7 +142,7 @@ public class CondutorService {
             sm = 0;
             peso = 11;
             for (i = 0; i < 10; i++) {
-                num = (int) (CPF.charAt(i) - 48);
+                num = (int) (cpfRegex.charAt(i) - 48);
                 sm = sm + (num * peso);
                 peso = peso - 1;
             }
@@ -146,7 +153,7 @@ public class CondutorService {
             else dig11 = (char) (r + 48);
 
             // Verifica se os digitos calculados conferem com os digitos informados.
-            if ((dig10 == CPF.charAt(9)) && (dig11 == CPF.charAt(10)))
+            if ((dig10 == cpfRegex.charAt(9)) && (dig11 == cpfRegex.charAt(10)))
                 return (true);
             else return (false);
         } catch (InputMismatchException erro) {
