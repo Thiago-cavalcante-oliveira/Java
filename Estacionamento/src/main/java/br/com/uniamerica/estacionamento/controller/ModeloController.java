@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/modelo")
 
@@ -56,8 +56,8 @@ public class ModeloController {
         }
     }
 
-    @PutMapping
-    public ResponseEntity<?> atualizaModelo(@RequestBody Modelo modelo, @RequestParam final Long id) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizaModelo( @PathVariable final Long id, @RequestBody Modelo modelo) {
         try {
             this.service.AtualizarModelo(modelo, id);
 
@@ -67,8 +67,8 @@ public class ModeloController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> excluiModelo(@RequestParam final Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> excluiModelo(@PathVariable("id") final Long id) {
 
         try {
 

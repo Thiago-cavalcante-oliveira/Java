@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/veiculo")
 
@@ -57,8 +57,8 @@ public class VeiculoController {
         }
     }
 
-    @PutMapping
-    public ResponseEntity<?> atualizar(@RequestParam("id") final Long id,
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizar(@PathVariable("id") final Long id,
                                        @RequestBody final Veiculo veiculo) {
         try {
             this.service.Atualizar(id, veiculo);
@@ -69,8 +69,8 @@ public class VeiculoController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deletaVeiculo(@RequestParam final Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletaVeiculo(@PathVariable final Long id) {
         try {
             this.service.deletar(id);
             return ResponseEntity.ok("Veiculo Deletado.");

@@ -13,7 +13,7 @@ import java.util.List;
 public interface MovimentacaoRepositorio extends JpaRepository <Movimentacao, Long> {
     @Query("select movi from Movimentacao movi where movi.ativo = true")
     public List<Movimentacao> listarAtivo();
-    @Query("select count(*)>0 from Movimentacao movimentcao where movimentcao.id = :id")
+    @Query("select count(*)>0 from Movimentacao movimentacao where movimentacao.id = :id")
     public boolean checaMovimentacao(@Param("id")Long id);
 
     @Query("select count(*)>0 from Movimentacao movimentcao where movimentcao.id = :id and movimentcao.entrada is not null and movimentcao.saida is not null")
@@ -24,8 +24,11 @@ public interface MovimentacaoRepositorio extends JpaRepository <Movimentacao, Lo
 
     @Query("select movi from Movimentacao movi where movi.ativo = true and movi.saida = null")
     public List<Movimentacao> listarSemSaida();
-    @Query("select count(*)>0 from Movimentacao movi where movi.id = :id  and movi.saida is null")
+    @Query("select count(*)>0 from Movimentacao movi where movi.veiculo.id = :id  and movi.saida is null")
     public boolean checaCarroEstacionado(@Param("id") Long id);
+
+    @Query("select movi.id from Movimentacao movi where movi.id = :id  and movi.saida is null")
+    public Long checaCarroEstacionadoAtualizar(@Param("id") Long id);
 
     @Query("select count(*)>0 from Movimentacao movimentacao where movimentacao.condutor.id = :id")
     public boolean checaCondutorMovimentacao(@Param("id") Long id);

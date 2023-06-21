@@ -55,8 +55,8 @@ public class MarcaController {
         }
        }
 
-    @PutMapping
-        public ResponseEntity<?> atualizaMarca(@RequestParam("id") final Long id,
+    @PutMapping("/{id}")
+        public ResponseEntity<?> atualizaMarca(@PathVariable("id") final Long id,
                                                @RequestBody final Marca marca)
     {
         try {

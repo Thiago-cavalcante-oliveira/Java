@@ -59,25 +59,25 @@ public class MovimentacaoService {
             throw new RuntimeException("Condutor inativo.");
         } else if (movimentacao.getVeiculo() == null) {
             throw new RuntimeException("veiculo nao informado.");
-        } else if (veiculoRepositorio.existsById(movimentacao.getVeiculo().getId())) {
+        } else if (!veiculoRepositorio.existsById(movimentacao.getVeiculo().getId())) {
             throw new RuntimeException("VEiculo não encontrado no banco de dados.");
         } else if (!veiculoRepositorio.getById(movimentacao.getVeiculo().getId()).isAtivo()) {
             throw new RuntimeException("Veiculo inativo");
         } else if (movimentacao.getEntrada() == null) {
             throw new RuntimeException("Entrada nao informado.");
-        } else if (repository.existsById(movimentacao.getVeiculo().getId())
-                && movimentacao.getSaida() == null) {
+        } else if (repository.checaCarroEstacionadoAtualizar(movimentacao.getVeiculo().getId()) == movimentacao.getId()
+                 ) {
             throw new RuntimeException("Veiculo já está estacionado.");
         }
         repository.save(movimentacao);
 
     }
 
-    public void deletar(@RequestParam("id") Long id) {
+    public void deletar(Long id) {
         Movimentacao movimentacao = this.repository.findById(id).orElse(null);
         if (id == null) {
             throw new RuntimeException("ID não informado.");
-        } else if (!repository.checaMovimentacao(id)) {
+        } else if (repository.checaMovimentacao(id)) {
             throw new RuntimeException("Id da movimentacao não localizado");
         } else if (!repository.checaMoviemntacaoAbertaSemSaida(id)) {
             movimentacao.setAtivo(false);

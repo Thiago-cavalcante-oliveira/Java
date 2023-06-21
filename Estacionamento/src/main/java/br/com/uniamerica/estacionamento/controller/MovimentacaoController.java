@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/movimentacao")
 
@@ -67,8 +67,8 @@ public class MovimentacaoController {
         }
     }
 
-    @PutMapping
-    public ResponseEntity<?> atualizaMovimentacao(@RequestParam("id") final Long id, @RequestBody final Movimentacao movimentacao) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizaMovimentacao(@PathVariable("id") final Long id, @RequestBody final Movimentacao movimentacao) {
         try {
 
             this.service.atualizar(movimentacao);
@@ -78,8 +78,8 @@ public class MovimentacaoController {
         }
     }
 
-    @PatchMapping
-    public ResponseEntity<?> finalizarEstacionamento(@RequestParam("id") Long id,
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> finalizarEstacionamento(@PathVariable("id") Long id,
                                                      @RequestBody Movimentacao sair) {
         try {
             service.calculaTempoEstacionado(id, sair);
@@ -89,10 +89,10 @@ public class MovimentacaoController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> inativar(@RequestParam("id") Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> inativar(@PathVariable("id") Long id) {
         try {
-            this.service.deletarMovimentacao(id);
+
             return ResponseEntity.ok(this.service.deletarMovimentacao(id));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.internalServerError().body("Error" + e + e.getCause().getCause().getMessage());

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.processing.Generated;
-
+@CrossOrigin
 @Controller
 @RequestMapping(value = "/api/configuracao")
 public class ConfiguracaoController {
@@ -48,8 +48,8 @@ public class ConfiguracaoController {
         }
        }
 
-    @PutMapping
-    public  ResponseEntity <?> editaConfiguracao(@RequestParam("id") final Long id, @RequestBody Configuracao configuracao){
+    @PutMapping("/{id}")
+    public  ResponseEntity <?> editaConfiguracao(@PathVariable("id") final Long id, @RequestBody Configuracao configuracao){
        try{
            this.service.atualizar(id, configuracao);
            return ResponseEntity.ok("Configuracao Atualizada com sucesso.");
@@ -58,8 +58,8 @@ public class ConfiguracaoController {
        }
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deletaConfiguracao(@RequestParam("id") final Long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletaConfiguracao(@PathVariable("id") final Long id){
 
         try{
         return  ResponseEntity.ok(service.deletar(id));
