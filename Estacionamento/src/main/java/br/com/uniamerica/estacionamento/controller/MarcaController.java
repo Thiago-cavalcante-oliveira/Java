@@ -23,8 +23,8 @@ public class MarcaController {
     @Autowired
     private MarcaRepositorio marcaRepositorio;
 
-    @GetMapping //outra forma de buscar por id
-    public ResponseEntity<?> findByIdRequest(@RequestParam("id")final Long id ){
+    @GetMapping ("/{id}")
+    public ResponseEntity<?> findByIdRequest(@PathVariable("id")final Long id ){
         try{
 
             return ResponseEntity.ok(service.buscaPorId(id));

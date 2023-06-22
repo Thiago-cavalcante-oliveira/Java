@@ -5,8 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Value;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Table(name = "tb_condutor", schema = "public")
@@ -27,17 +29,18 @@ public class Condutor extends Entitty {
     private String telefone;
     @Getter
     @Setter
-    @Column(name = "tempo_pago_minuto")
-    private Long tempoPagoEmMinuto;
+    @Column(name = "tempo_pago_minuto", columnDefinition = "integer default 0")
+    private Long tempoPagoEmMinuto = 0L;
 
     @Getter
     @Setter
-    @Column(name = "tempo_pago_hora")
-    private Long tempoPagoEmHora;
+
+    @Column(name = "tempo_pago_hora", columnDefinition = "integer default 0")
+    private Long tempoPagoEmHora=  0L;
     @Getter
     @Setter
-    @Column(name = "tempo_desconto")
-    private Long tempoDesconto;
+    @Column(name = "tempo_desconto", columnDefinition = "integer default 0")
+    private Long tempoDesconto = 0L;
 }
 
 
