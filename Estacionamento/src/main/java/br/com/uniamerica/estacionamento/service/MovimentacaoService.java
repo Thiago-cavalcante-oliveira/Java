@@ -88,16 +88,24 @@ public class MovimentacaoService {
 
     @Transactional(rollbackFor = Exception.class)
     public void calculaTempoEstacionado(Long id, Movimentacao saida) {
+
+        if (!this.repository.existsById(id)) {
+            throw new RuntimeException("ID nao encontrado");
+        }
+
         if (!configuracaoRepositorio.checaConfiguracaoAtiva()) {
             throw new RuntimeException("Não há uma Configuracao cadastrada.");
         }
         Long calculaDesconto, calculaHoraEstacionado, tempoEstacionado, tempoPagoCondutor;
+
         Configuracao configuracao = this.configuracaoRepositorio.buscaUltimaConfiguracaoCadastrada();
         Movimentacao movimentacao = this.repository.getById(id);
         movimentacao.setSaida(saida.getSaida());
         Condutor condutor = movimentacao.getCondutor();
 
-        if (movimentacao.getSaida() == null) {
+        if (movimentacao == null) {
+            throw new RuntimeException("Id não encontrado");
+        } else if (movimentacao.getSaida() == null) {
             throw new RuntimeException("Vc precisa informar a data e hora da saída.");
         } else if (movimentacao.getSaida().isBefore(movimentacao.getEntrada())) {
             throw new RuntimeException("A saída não pode ser anterior a entrada.");
@@ -115,7 +123,7 @@ public class MovimentacaoService {
         movimentacao.setValorHora(valorEstacionado.multiply(configuracao.getValorHora().divide(BigDecimal.valueOf(60))));
         calculaHoraEstacionado = tempoPagoCondutor / 60;
 
-        calculaDesconto = (calculaHoraEstacionado / configuracao.getTempoParaGerarDesconto()) * configuracao.getTempoDeCreditoDesconto();
+        calculaDesconto = (condutor.getTempoDesconto()) + (calculaHoraEstacionado / configuracao.getTempoParaGerarDesconto()) * configuracao.getTempoDeCreditoDesconto();
         //calculaDesconto = calculaDesconto/60;
         tempoPagoCondutor = (tempoPagoCondutor % configuracao.getTempoParaGerarDesconto());
 
@@ -193,7 +201,7 @@ public class MovimentacaoService {
                 " \nDATA DE SAÍDA: " + movimentacao.getSaida().getDayOfMonth() + "/" + movimentacao.getSaida().getMonthValue() + "/" + movimentacao.getSaida().getYear() +
                 "|HORA DE SAIDA: " + movimentacao.getSaida().getHour() + ":" + movimentacao.getSaida().getMinute() + "\n" +
                 "----------------------------------\n" +
-                "|TEMPO ESTACIONADO: " + movimentacao.getTempo() / 60 + " HORAS+" + "\n" +
+                "|TEMPO ESTACIONADO: " + movimentacao.getTempo() / 60 + ":" + movimentacao.getTempo() % 60 + "\n" +
                 "|VALOR DA HORA NORMAL: R$ " + configuracao.getValorHora() + "\n" +
                 "|VALOR DO TEMPO ESTACIONADO: R$ " + movimentacao.getValorHora() + "\n" +
                 "|TEMPO DE MULTA GERADO EM MINUTOS: " + movimentacao.getTempoMulta() + "\n" +

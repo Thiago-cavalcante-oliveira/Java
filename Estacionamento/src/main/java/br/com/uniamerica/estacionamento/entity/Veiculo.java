@@ -3,10 +3,13 @@ package br.com.uniamerica.estacionamento.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
 
-import java.time.LocalDateTime;
 @Entity
-@Table(name = "veiculos", schema = "public")
+@Table(name = "tb_veiculos", schema = "public")
+@Audited
+@AuditTable(value="veiculos_audit", schema="audit")
 public class Veiculo extends Entitty{
     @Getter @Setter
     @Column(name = "num_placa_veiculo", nullable = false, length = 10)

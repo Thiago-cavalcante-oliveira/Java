@@ -18,5 +18,4 @@ public class Marca extends Entitty{
     @Column(name = "nm_marca", nullable = false, length= 50)
     private String nome;
 
-
 }

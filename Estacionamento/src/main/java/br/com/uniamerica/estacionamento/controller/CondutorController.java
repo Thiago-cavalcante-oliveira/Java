@@ -23,34 +23,32 @@ public class CondutorController {
     //private CondutorRepositorio condutorRepositorio;
     @Autowired
     private CondutorRepositorio condutorRepositorio;
-   @Autowired
-   private CondutorService service;
+    @Autowired
+    private CondutorService service;
 
     @GetMapping //outra forma de buscar por id
-    public ResponseEntity<?> findByIdRequest(@RequestParam("id")final Long id ){
-        try{
+    public ResponseEntity<?> findByIdRequest(@RequestParam("id") final Long id) {
+        try {
             return ResponseEntity.ok(service.buscaPorId(id));
-        }
-        catch (RuntimeException e){
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
 
 
-   @GetMapping("/listaativo")
-   public ResponseEntity <?> listaCondutorAtivo (){
-
-           return ResponseEntity.ok(condutorRepositorio.listarAtivos()) ;
-       }
+    @GetMapping("/listaativo")
+    public ResponseEntity<?> listaCondutorAtivo() {
+        return ResponseEntity.ok(condutorRepositorio.listarAtivos());
+    }
 
 
     @GetMapping("/lista")
-    public ResponseEntity <?> listaCompletaCondutor (){
+    public ResponseEntity<?> listaCompletaCondutor() {
         return ResponseEntity.ok(this.condutorRepositorio.findAll());
     }
 
     @PostMapping
-    public ResponseEntity <?> cadastrar (@RequestBody final Condutor condutor) {
+    public ResponseEntity<?> cadastrar(@RequestBody final Condutor condutor) {
         try {
             this.service.cadastrar(condutor);
             return ResponseEntity.ok("Registro cadastrado com sucesso");
@@ -58,35 +56,28 @@ public class CondutorController {
             return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
-   @PutMapping
-    public ResponseEntity <?> editar(
+
+    @PutMapping
+    public ResponseEntity<?> editar(
             @RequestParam("id") final Long id,
-            @RequestBody final Condutor condutor){
+            @RequestBody final Condutor condutor) {
         try {
-            service.Atualizar(id,condutor);
+            service.Atualizar(id, condutor);
             return ResponseEntity.ok("Atualizado.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
-       catch (RuntimeException e){
-            return ResponseEntity.badRequest().body("Erro: "+ e.getMessage());
-       }
-   }
-
-
-
-    @DeleteMapping
-    public ResponseEntity <?> inativar(@RequestParam("id") Long id){
-      try{
-
-          return ResponseEntity.ok( this.service.deletar(id));
-      }
-      catch (RuntimeException e){
-          return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
-      }
     }
 
 
-
-
+    @DeleteMapping
+    public ResponseEntity<?> inativar(@RequestParam("id") Long id) {
+        try {
+            return ResponseEntity.ok(this.service.deletar(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
+    }
 
 
 }

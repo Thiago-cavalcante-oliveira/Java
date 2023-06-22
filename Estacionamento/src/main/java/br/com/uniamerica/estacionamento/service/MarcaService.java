@@ -66,7 +66,7 @@ public class MarcaService {
     public void deletar(final Long id) {
 
         Marca marca = this.repository.findById(id).orElse(null);
-        if(id == null ){
+        if(marca == null ){
             throw new RuntimeException("Id não informado");
         } else if (!repository.checaId(id)) {
             throw new RuntimeException("ID não cadastrado na base de dados.");

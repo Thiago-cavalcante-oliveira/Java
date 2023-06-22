@@ -1,4 +1,5 @@
 package br.com.uniamerica.estacionamento.entity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -6,15 +7,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
-import org.springframework.context.annotation.EnableMBeanExport;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 @Entity
-
-@Table(name = "tb_condutores", schema = "public")
-//@Audited
-//@AuditTable(value = "condutores_audit", schema = "audit")
+@Table(name = "tb_condutor", schema = "public")
+@Audited
+@AuditTable(value = "condutor_audit", schema = "audit")
 public class Condutor extends Entitty {
     @Getter
     @Setter
@@ -30,16 +27,16 @@ public class Condutor extends Entitty {
     private String telefone;
     @Getter
     @Setter
-    @Column(name = "tempo_pago_minuto", columnDefinition = "default = 0")
-    private Long tempoPagoEmMinuto ;
+    @Column(name = "tempo_pago_minuto")
+    private Long tempoPagoEmMinuto;
 
     @Getter
     @Setter
-    @Column(name = "tempo_pago_hora" ,columnDefinition = "default = 0")
+    @Column(name = "tempo_pago_hora")
     private Long tempoPagoEmHora;
     @Getter
     @Setter
-    @Column(name = "tempo_desconto",columnDefinition = "default = 0")
+    @Column(name = "tempo_desconto")
     private Long tempoDesconto;
 }
 

@@ -10,8 +10,8 @@ import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+
 @Entity
 @Table(name = "tb_configuracoes", schema = "public")
 @Audited

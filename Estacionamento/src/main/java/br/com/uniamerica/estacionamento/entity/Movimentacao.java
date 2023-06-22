@@ -3,62 +3,66 @@ package br.com.uniamerica.estacionamento.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+
 @Entity
-@Table(name = "movimentacoes", schema = "public")
+@Table(name = "tb_movimentacoes", schema = "public")
+@Audited
+@AuditTable(value="movimentacao_audit", schema="audit")
 public class Movimentacao extends Entitty {
     @Getter
     @Setter
-    @JoinColumn(name = "co-veiculo")
+    @JoinColumn(name = "co_veiculo")
     @ManyToOne
     private Veiculo veiculo;
     @Getter
     @Setter
-    @JoinColumn(name = "co-condutor")
+    @JoinColumn(name = "co_condutor")
     @ManyToOne
     private Condutor condutor;
     @Getter
     @Setter
-    @Column(name = "dt-entrada", nullable = false)
+    @Column(name = "dt_entrada", nullable = false)
     private LocalDateTime entrada;
     @Getter
     @Setter
-    @Column(name = "dt-saida")
+    @Column(name = "dt_saida")
     private LocalDateTime saida;
     @Getter
     @Setter
-    @Column(name = "ds-tempo-uso")
+    @Column(name = "ds_tempo_uso")
     private Long tempo;
     @Getter
     @Setter
-    @Column(name = "ds-tempo-desconto")
+    @Column(name = "ds_tempo_desconto")
     private Long tempoDesconto;
     @Getter
     @Setter
-    @Column(name = "ds-tempo-multa")
+    @Column(name = "ds_tempo_multa")
     private Long tempoMulta;
     @Getter
     @Setter
-    @Column(name = "vl-desconto")
+    @Column(name = "vl_desconto")
     private BigDecimal valorDesconto;
     @Getter
     @Setter
-    @Column(name = "ds-valor-multa")
+    @Column(name = "ds_valor_multa")
     private BigDecimal valorMulta;
     @Getter
     @Setter
-    @Column(name = "ds-valor-total")
+    @Column(name = "ds_valor_total")
     private BigDecimal valorTotal;
     @Getter
     @Setter
-    @Column(name = "ds-valor-hora")
+    @Column(name = "ds_valor_hora")
     private BigDecimal valorHora;
     @Getter
     @Setter
-    @Column(name = "ds-valor-hora-multa")
+    @Column(name = "ds_valor_hora_multa")
     private BigDecimal valorHoraMulta;
 
     @Getter
@@ -69,7 +73,7 @@ public class Movimentacao extends Entitty {
 
     @Getter
     @Setter
-    @JoinColumn(name = "versao_configuracao")
+    @Column(name = "versao_configuracao")
     private int versao;
 
 
