@@ -20,8 +20,8 @@ public class ConfiguracaoController {
     @Autowired
     private ConfiguracaoService service;
 
-    @GetMapping
-    public ResponseEntity <?> buscaid(@RequestParam("id") final Long id){
+    @GetMapping("/{id}")
+    public ResponseEntity <?> buscaid(@PathVariable("id") final Long id){
         final Configuracao configuracao = this.configuracaoRepositorio.findById(id).orElse(null);
         return configuracao == null ? ResponseEntity.badRequest().body("Não localizado") :
                 ResponseEntity.ok(configuracao);

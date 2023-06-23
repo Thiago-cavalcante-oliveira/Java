@@ -26,8 +26,8 @@ public class ModeloController {
     private ModeloRepositorio repository;
 
 
-    @GetMapping
-    public ResponseEntity<?> buscarModelo(@RequestParam("id") final Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscarModelo(@PathVariable("id") final Long id) {
 
         try {
             return ResponseEntity.ok(service.BuscarPorID(id));

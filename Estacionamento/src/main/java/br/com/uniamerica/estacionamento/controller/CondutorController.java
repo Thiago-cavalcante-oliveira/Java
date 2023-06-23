@@ -26,8 +26,8 @@ public class CondutorController {
     @Autowired
     private CondutorService service;
 
-    @GetMapping //outra forma de buscar por id
-    public ResponseEntity<?> findByIdRequest(@RequestParam("id") final Long id) {
+    @GetMapping ("/{id}")
+    public ResponseEntity<?> findByIdRequest(@PathVariable("id") final Long id) {
         try {
             return ResponseEntity.ok(service.buscaPorId(id));
         } catch (RuntimeException e) {
@@ -57,9 +57,9 @@ public class CondutorController {
         }
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<?> editar(
-            @RequestParam("id") final Long id,
+            @PathVariable("id") final Long id,
             @RequestBody final Condutor condutor) {
         try {
             service.Atualizar(id, condutor);

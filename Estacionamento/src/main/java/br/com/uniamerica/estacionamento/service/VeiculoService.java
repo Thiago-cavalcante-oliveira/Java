@@ -39,7 +39,10 @@ public class VeiculoService {
     public void cadastrar(final Veiculo veiculo) {
         if (veiculo.getPlaca() == null) {
             throw new RuntimeException("Placa não informado");
-        } else if (veiculo.getPlaca().matches("^[a-z|A-Z]{3}-[0-9]{1}[a-z|A-Z]{3}$|^[a-z|A-Z]{4}-[a-z|A-Z]{3}$|^[a-z|A-Z]{2}-[0-9]{3}[a-z|A-Z]{2}$|^[a-z|A-Z]{3}-[0-9]{4}$|^[a-z|A-Z]{3}-[0-9]{3}$")) {
+        } else if  (!veiculo.getPlaca().matches("^[a-z|A-Z]{3}-[0-9]{1}[a-z|A-Z]{1}[0-9]{2}$" )
+                && !veiculo.getPlaca().matches("^[a-z|A-Z]{4}-[a-z|A-Z]{3}$") &&
+                !veiculo.getPlaca().matches("^[a-z|A-Z]{2}-[0-9]{3}[a-z|A-Z]{2}$") &&
+                !veiculo.getPlaca().matches("^[a-z|A-Z]{3}-[0-9]{4}$|^[a-z|A-Z]{3}-[0-9]{3}$")) {
             throw new RuntimeException("Placa informada inválida. A placa deve seguir o padrão do Detran");
         } else if (veiculo.getCor() == null) {
             throw new RuntimeException("cor não informado");
@@ -64,7 +67,10 @@ public class VeiculoService {
 
         if (veiculo.getPlaca() == null) {
             throw new RuntimeException("placa não informado");
-        } else if (!veiculo.getPlaca().matches("^[a-z|A-Z]{3}-[0-9]{1}[a-z|A-Z]{3}$|^[a-z|A-Z]{4}-[a-z|A-Z]{3}$|^[a-z|A-Z]{2}-[0-9]{3}[a-z|A-Z]{2}$|^[a-z|A-Z]{3}-[0-9]{4}$|^[a-z|A-Z]{3}-[0-9]{3}$")) {
+        } else if (!veiculo.getPlaca().matches("^[a-z|A-Z]{3}-[0-9]{1}[a-z|A-Z]{3}$" )
+                && !veiculo.getPlaca().matches("^[a-z|A-Z]{4}-[a-z|A-Z]{3}$") &&
+        !veiculo.getPlaca().matches("^[a-z|A-Z]{2}-[0-9]{3}[a-z|A-Z]{2}$") &&
+        !veiculo.getPlaca().matches("^[a-z|A-Z]{3}-[0-9]{4}$|^[a-z|A-Z]{3}-[0-9]{3}$")) {
             throw new RuntimeException("Placa informada inválida. A placa deve seguir o padrão do Detran");
         } else if (id != veiculo.getId()) {
             throw new RuntimeException("Existe um erro com o ID informado");

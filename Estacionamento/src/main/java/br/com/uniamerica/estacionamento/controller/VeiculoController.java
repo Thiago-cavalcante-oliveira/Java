@@ -27,8 +27,8 @@ public class VeiculoController {
         this.veiculoRepositorio = veiculoRepositorio;
     }
 
-    @GetMapping
-    public ResponseEntity<?> buscaVeiculoPorId(@RequestParam("id") final Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscaVeiculoPorId(@PathVariable("id") final Long id) {
         try {
             return ResponseEntity.ok(service.BuscarPorID(id));
         } catch (RuntimeException e) {
