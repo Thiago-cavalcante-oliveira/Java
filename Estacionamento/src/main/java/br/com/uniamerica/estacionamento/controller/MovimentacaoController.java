@@ -29,8 +29,8 @@ public class MovimentacaoController {
     @Autowired
     private MovimentacaoService service;
 
-    @GetMapping
-    public ResponseEntity<?> buscaMovimentacao(@RequestParam("id") final Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscaMovimentacao(@PathVariable("id") final Long id) {
         final Movimentacao movimentacao = this.movimentacaoRepositorio.findById(id).orElse(null);
         try {
             return ResponseEntity.ok(movimentacao);

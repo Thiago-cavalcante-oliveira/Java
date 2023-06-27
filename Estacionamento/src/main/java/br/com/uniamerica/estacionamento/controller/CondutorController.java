@@ -70,8 +70,8 @@ public class CondutorController {
     }
 
 
-    @DeleteMapping
-    public ResponseEntity<?> inativar(@RequestParam("id") Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> inativar(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(this.service.deletar(id));
         } catch (RuntimeException e) {

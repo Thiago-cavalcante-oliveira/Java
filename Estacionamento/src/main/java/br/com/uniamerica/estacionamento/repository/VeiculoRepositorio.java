@@ -36,5 +36,8 @@ public interface VeiculoRepositorio extends JpaRepository <Veiculo, Long> {
 
     @Query("select count (*)>0 from Movimentacao movimentacao where movimentacao.veiculo.id = :id and movimentacao.saida = null ")
     public boolean checaMoviemntacaoAbertaSemSaida(@Param("id") Long id);
+
+    @Query("select count (*)>0 from Movimentacao movimentacao where movimentacao.veiculo.id = :id ")
+    public boolean checaMoviemntacaoVeiculo(@Param("id") Long id);
 }
 
